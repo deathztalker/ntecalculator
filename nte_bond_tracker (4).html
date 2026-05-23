@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NTE · Bond Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050508;--bg1:#09090f;--bg2:#0e0e18;--bg3:#13131f;--bg4:#181826;--bg5:#1e1e2e;--bg6:#242438;
+  --b:rgba(255,255,255,0.04);--b2:rgba(255,255,255,0.08);--b3:rgba(255,255,255,0.15);
+  --t:#e0e0f5;--t2:#7777a0;--t3:#3e3e5a;
+  --ac:#7c6ff7;--ac2:#5a50d4;--acg:rgba(124,111,247,0.15);--acs:rgba(124,111,247,0.08);
+  --gold:#f0b842;--goldb:rgba(240,184,66,0.1);
+  --green:#36d674;--greenb:rgba(54,214,116,0.1);
+  --blue:#5ba8ff;--red:#ff5a5a;--pink:#ff6eb4;--teal:#2bcfbb;--or:#ff8c42;
+  --fons:#f0b842;
+  --cosmos:#a78bfa;--anima:#4ade80;--incant:#f87171;--chaos:#fbbf24;--psyche:#60a5fa;--lakshana:#f472b6;
+  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
+  --r1:6px;--r2:12px;--r3:18px;--r4:24px;
+  --sh:0 8px 32px rgba(0,0,0,0.5);
+  --sh2:0 2px 12px rgba(0,0,0,0.4);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden;line-height:1.5}
+
+/* NOISE */
+body::before{content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.02;pointer-events:none;z-index:0}
+.z{position:relative;z-index:1}
+::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg6);border-radius:99px}
+
+/* AMBIENT GLOW */
+.glow-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.glow-bg::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(124,111,247,0.06),transparent 70%);top:-200px;left:-100px;animation:drift1 20s ease-in-out infinite}
+.glow-bg::after{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(47,212,187,0.04),transparent 70%);bottom:-100px;right:-100px;animation:drift2 25s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(80px,60px)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-60px,-40px)}}
+
+/* HEADER */
+.hdr{background:rgba(9,9,15,0.9);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border-bottom:1px solid var(--b2);padding:0 24px;height:52px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:300}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;box-shadow:0 0 20px var(--acg),0 2px 8px rgba(0,0,0,.4)}
+.logo-text{font-family:var(--fd);font-size:15px;font-weight:800;letter-spacing:-.5px}
+.logo-sub{font-size:9px;color:var(--t3);font-weight:400;margin-left:2px}
+.hdr-right{margin-left:auto;display:flex;gap:6px;align-items:center}
+.hpill{height:26px;padding:0 10px;border-radius:99px;background:rgba(255,255,255,0.04);border:1px solid var(--b2);font-size:11px;color:var(--t2);display:flex;align-items:center;gap:4px;font-weight:500;transition:all .2s}
+.hpill:hover{border-color:var(--b3)}
+.hpill b{font-weight:800;font-size:12px}
+.hpill.gold b{color:var(--gold)}.hpill.ac b{color:var(--ac)}.hpill.gr b{color:var(--green)}
+
+/* TABS */
+.tabs{background:rgba(9,9,15,0.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--b);padding:0 24px;display:flex;overflow-x:auto;position:sticky;top:52px;z-index:290;gap:0}
+.tabs::-webkit-scrollbar{height:0}
+.tab{padding:0 15px;height:40px;font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px;transition:color .15s,border-color .15s;white-space:nowrap;position:relative}
+.tab i{font-size:14px}
+.tab:hover{color:var(--t2)}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac)}
+.tab-badge{position:absolute;top:8px;right:8px;width:16px;height:16px;border-radius:50%;background:var(--ac);color:#fff;font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;font-family:var(--fd)}
+
+/* PANELS */
+.pnl{display:none;padding:20px 24px;max-width:1200px;margin:0 auto;width:100%}
+.pnl.on{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTION LABEL */
+.sec{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.sec-t{font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--t3)}
+.sec-n{background:var(--bg4);border:1px solid var(--b);border-radius:99px;padding:1px 7px;font-size:9px;color:var(--t3)}
+.ml{margin-left:auto}
+.divider{height:1px;background:var(--b);margin:18px 0}
+
+/* ═══ CHARS PAGE ═══ */
+.chars-layout{display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start}
+@media(max-width:960px){.chars-layout{grid-template-columns:1fr}}
+
+/* DAILY STRIP */
+.dstrip{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--b2);border-radius:var(--r3);padding:14px 18px;margin-bottom:14px;position:relative;overflow:hidden}
+.dstrip::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,111,247,.04),transparent);pointer-events:none}
+.ds{text-align:center;flex:1;min-width:50px}
+.dsn{font-family:var(--fd);font-size:22px;font-weight:800;line-height:1;margin-bottom:2px;transition:color .3s}
+.dsl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.ds-sep{width:1px;height:32px;background:var(--b2);flex-shrink:0}
+.ds-prog{flex:3;min-width:140px}
+.ds-pt{display:flex;justify-content:space-between;font-size:10px;color:var(--t2);margin-bottom:5px;font-weight:500}
+.ds-bar{height:4px;background:var(--bg6);border-radius:99px;overflow:hidden;position:relative}
+.ds-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ac),var(--teal));transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* FILTER BAR */
+.fbar{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:13px}
+.chip{height:24px;padding:0 9px;border-radius:99px;background:var(--bg3);border:1px solid var(--b);font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.05em;color:var(--t3);cursor:pointer;transition:all .14s;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.chip i{font-size:11px}
+.chip:hover{border-color:var(--b2);color:var(--t2)}
+.chip.on{background:var(--acg);border-color:var(--ac);color:var(--ac)}
+.chip.on.eco{background:rgba(167,139,250,.1);border-color:var(--cosmos);color:var(--cosmos)}
+.chip.on.ean{background:rgba(74,222,128,.1);border-color:var(--anima);color:var(--anima)}
+.chip.on.ein{background:rgba(248,113,113,.1);border-color:var(--incant);color:var(--incant)}
+.chip.on.ech{background:rgba(251,191,36,.1);border-color:var(--chaos);color:var(--chaos)}
+.chip.on.eps{background:rgba(96,165,250,.1);border-color:var(--psyche);color:var(--psyche)}
+.chip.on.ela{background:rgba(244,114,182,.1);border-color:var(--lakshana);color:var(--lakshana)}
+
+/* CHAR GRID */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:7px}
+
+/* CHAR CARD */
+.cc{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r3);padding:12px 7px 10px;text-align:center;cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.cc::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.025),transparent);pointer-events:none;border-radius:inherit}
+.cc:hover{border-color:var(--b2);background:var(--bg3);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.cc.sel{border-color:var(--ac);background:var(--bg3);box-shadow:0 0 0 1px var(--ac),0 8px 32px var(--acg)}
+.cc.maxed{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 4px 16px var(--goldb)}
+.cc.maxed::after{content:'MAX';position:absolute;top:6px;right:6px;font-size:7px;font-weight:900;color:var(--gold);letter-spacing:.06em;font-family:var(--fd)}
+.cc-av{position:relative;width:48px;margin:0 auto 8px}
+.cav{width:48px;height:48px;border-radius:50%;object-fit:cover;display:block;transition:transform .2s}
+.cc:hover .cav{transform:scale(1.05)}
+.cav-fb{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;font-family:var(--fd)}
+.crar{position:absolute;bottom:-2px;right:-4px;width:15px;height:15px;border-radius:50%;font-size:7px;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg2);z-index:2;font-family:var(--fd)}
+.rs{background:var(--gold);color:#000}.ra{background:var(--ac);color:#fff}
+.cname{font-family:var(--fd);font-size:10px;font-weight:700;color:var(--t);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cel{font-size:8px;color:var(--t3)}
+.cbar{height:2px;background:var(--bg6);border-radius:99px;margin-top:5px;overflow:hidden}
+.cbarf{height:100%;border-radius:99px;transition:width .4s}
+/* Element colors */
+.eco{color:var(--cosmos)}.ean{color:var(--anima)}.ein{color:var(--incant)}.ech{color:var(--chaos)}.eps{color:var(--psyche)}.ela{color:var(--lakshana)}
+
+/* ═══ DETAIL PANEL ═══ */
+.dp-sticky{position:sticky;top:100px}
+.dp{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r4);overflow:hidden;box-shadow:var(--sh)}
+.dp-empty{padding:48px 20px;text-align:center;color:var(--t3)}
+.dp-empty i{font-size:30px;display:block;margin-bottom:10px;opacity:.25}
+.dp-empty p{font-size:11px;line-height:1.8}
+
+/* HERO */
+.dp-hero{padding:20px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:14px;position:relative;overflow:hidden}
+.dp-hero::before{content:'';position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:var(--hc,var(--ac));opacity:.08;filter:blur(35px);pointer-events:none}
+.dp-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.025),transparent);pointer-events:none}
+.hav{width:64px;height:64px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--b2);box-shadow:0 0 16px rgba(0,0,0,.4)}
+.hav-fb{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--fd)}
+.hrar{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg2);font-family:var(--fd)}
+.hname{font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:3px}
+.hrole{font-size:11px;margin-bottom:8px}
+.htags{display:flex;gap:4px;flex-wrap:wrap}
+.dtag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;font-family:var(--fd);letter-spacing:.03em}
+.dts{background:var(--goldb);color:var(--gold);border:1px solid rgba(240,184,66,.2)}
+.dta{background:var(--acg);color:var(--ac);border:1px solid rgba(124,111,247,.2)}
+.dtel{background:var(--bg5);color:var(--t2);border:1px solid var(--b)}
+.dtlim{background:rgba(255,110,180,.1);color:var(--pink);border:1px solid rgba(255,110,180,.2)}
+
+/* DETAIL BODY */
+.dp-body{padding:0 16px 16px;display:flex;flex-direction:column;max-height:72vh;overflow-y:auto}
+.dp-sec{padding:13px 0;border-bottom:1px solid var(--b)}
+.dp-sec:last-child{border-bottom:none}
+.dp-sec-t{font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.dp-sec-t span{margin-left:auto;font-size:9px;color:var(--t3);font-weight:500;font-family:var(--fb);letter-spacing:0;text-transform:none}
+
+/* AP EDIT */
+.aprow{display:flex;align-items:center;gap:6px}
+.aplbl{font-size:11px;color:var(--t2);flex-shrink:0}
+.apinp{flex:1;min-width:0;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:14px;font-weight:700;padding:7px 10px;font-family:var(--fd);transition:border-color .15s,box-shadow .15s}
+.apinp:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--acg)}
+.apbtn{background:var(--ac);border:none;color:#fff;border-radius:var(--r1);padding:7px 12px;font-size:10px;font-weight:800;font-family:var(--fd);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap;box-shadow:0 2px 8px var(--acg)}
+.apbtn:hover{opacity:.85;transform:translateY(-1px)}
+.apbtn:active{transform:translateY(0)}
+.aphint{font-size:9px;color:var(--t3);margin-top:4px;line-height:1.6}
+
+/* BOND */
+.bnums{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.blv{font-family:var(--fd);font-size:14px;font-weight:800}
+.bpct{font-size:10px;color:var(--t2)}
+.btrack{height:8px;background:var(--bg6);border-radius:99px;overflow:hidden;margin-bottom:4px;position:relative}
+.bfill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1);position:relative}
+.bfill::after{content:'';position:absolute;right:2px;top:2px;bottom:2px;width:3px;background:rgba(255,255,255,.5);border-radius:99px}
+.bmeta{font-size:9px;color:var(--t3);text-align:right}
+.bopt{margin-top:10px;padding:10px 12px;background:rgba(124,111,247,.07);border:1px solid rgba(124,111,247,.15);border-radius:var(--r2);font-size:10px;color:var(--t2);line-height:1.75;position:relative;overflow:hidden}
+.bopt::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--ac);border-radius:99px}
+.bopt strong{color:var(--t)}.bopt .hl{color:var(--fons);font-weight:700}
+
+/* BOND LVLS */
+.unlocks{display:flex;flex-direction:column;gap:4px}
+.unl{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);transition:all .15s}
+.unl:hover{border-color:var(--b2)}
+.unl.done{border-color:rgba(54,214,116,.2);background:rgba(54,214,116,.04)}
+.ulv{font-family:var(--fd);font-size:9px;font-weight:800;color:var(--ac);min-width:36px}
+.unl.done .ulv{color:var(--green)}
+.utxt{flex:1;font-size:10px;color:var(--t2);line-height:1.4}
+.uico{font-size:14px;flex-shrink:0}
+.ud{color:var(--green)}.ul2{color:var(--t3)}
+
+/* GIFTS */
+.gift{display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);margin-bottom:5px;transition:all .15s;cursor:default}
+.gift:hover{border-color:var(--b2);transform:translateX(3px);background:var(--bg4)}
+.gtier{font-size:9px;font-weight:800;padding:3px 8px;border-radius:99px;flex-shrink:0;font-family:var(--fd);letter-spacing:.02em}
+.g2000{background:rgba(240,184,66,.2);color:var(--gold)}.g400{background:rgba(124,111,247,.2);color:var(--ac)}.g200{background:rgba(91,168,255,.18);color:var(--blue)}.g100{background:rgba(54,214,116,.15);color:var(--green)}
+.gi{flex:1;min-width:0}
+.gname{font-size:11px;font-weight:600;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gsrc{font-size:9px;color:var(--t3);margin-top:2px}
+.gprice{font-size:11px;font-weight:800;color:var(--fons);flex-shrink:0;white-space:nowrap}
+.gprice.free{color:var(--green)}.gprice.exch{color:var(--ac)}.gprice.na{color:var(--t3);font-size:9px;font-weight:500}
+.gbtn{background:transparent;border:1px solid var(--b2);border-radius:var(--r1);color:var(--t2);padding:5px 10px;font-size:10px;font-weight:800;cursor:pointer;transition:all .15s;flex-shrink:0;font-family:var(--fd);letter-spacing:.04em}
+.gbtn:hover:not([disabled]){background:var(--ac);border-color:var(--ac);color:#fff;transform:scale(1.05)}
+.gbtn:active:not([disabled]){transform:scale(0.98)}
+.gbtn[disabled]{opacity:.3;cursor:default}
+.gmsg{font-size:10px;color:var(--t3);text-align:center;margin-top:6px;padding:4px}
+
+/* RESET */
+.rbtn{width:100%;padding:7px;font-size:9px;font-weight:800;font-family:var(--fd);letter-spacing:.1em;text-transform:uppercase;color:var(--t3);background:transparent;border:1px solid var(--b);border-radius:var(--r2);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.rbtn:hover{color:var(--t);border-color:var(--b2);background:var(--bg3)}
+
+/* ═══ BOX ═══ */
+.box{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r4);padding:20px;transition:border-color .2s}
+.box:hover{border-color:var(--b2)}
+.box-t{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:16px;display:flex;align-items:center;gap:7px}
+.box-t i{color:var(--ac);font-size:15px}
+.box-t span{margin-left:auto;font-size:9px;color:var(--t3);font-weight:500;font-family:var(--fb);letter-spacing:0;text-transform:none}
+
+/* FORM */
+.fr{margin-bottom:12px}
+.fr label{display:block;font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.fr select,.fr input[type=number],.fr input[type=text]{width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r2);color:var(--t);font-size:12px;font-weight:500;padding:8px 10px;font-family:var(--fb);transition:border-color .15s,box-shadow .15s}
+.fr select:focus,.fr input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--acg)}
+.fr select option{background:#0e0e18}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* RESULTS */
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.rcard{background:var(--bg3);border:1px solid var(--b);border-radius:var(--r3);padding:13px 10px;text-align:center;position:relative;overflow:hidden;transition:all .15s}
+.rcard:hover{border-color:var(--b2);transform:translateY(-1px)}
+.rcard::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.02),transparent);pointer-events:none}
+.rv{font-family:var(--fd);font-size:20px;font-weight:800;line-height:1;margin-bottom:3px;transition:color .3s}
+.rl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em}
+.rcard.days .rv{color:var(--teal)}.rcard.fons .rv{color:var(--gold)}.rcard.cnt .rv{color:var(--ac)}
+
+/* COMPARISON */
+.tl-h{font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin:14px 0 8px}
+.tl-r{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.tl-n{font-size:10px;color:var(--t2);width:115px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-tr{flex:1;height:5px;background:var(--bg6);border-radius:99px;overflow:hidden}
+.tl-f{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.tl-v{font-size:9px;color:var(--t);min-width:72px;text-align:right;flex-shrink:0;font-weight:600}
+
+/* ALL SUMMARY */
+.acs{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b);transition:background .15s}
+.acs:hover{background:var(--bg3);margin:0 -4px;padding:8px 4px;border-radius:var(--r1)}
+.acm{flex:1;min-width:0}
+.acn{font-family:var(--fd);font-size:11px;font-weight:700;color:var(--t)}
+.acbar{height:3px;background:var(--bg6);border-radius:99px;overflow:hidden;margin-top:4px}
+.acbf{height:100%;border-radius:99px;transition:width .5s}
+.acr{text-align:right;flex-shrink:0}
+.aclv{font-family:var(--fd);font-size:12px;font-weight:800;color:var(--t)}
+.acd{font-size:9px;color:var(--t3)}
+
+/* AI BOX */
+.aibox{background:linear-gradient(135deg,rgba(124,111,247,.07),rgba(91,168,255,.04));border:1px solid rgba(124,111,247,.18);border-radius:var(--r3);padding:14px;margin-top:12px}
+.ai-t{font-family:var(--fd);font-size:9px;font-weight:800;color:var(--ac);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.ai-o{font-size:11px;color:var(--t2);line-height:1.8;min-height:40px}
+.ai-ld{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t3)}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--ac);animation:blink 1.2s ease infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.12}40%{opacity:1}}
+.ai-btn{margin-top:9px;background:var(--ac);border:none;color:#fff;border-radius:var(--r2);padding:8px 13px;font-size:10px;font-weight:800;font-family:var(--fd);letter-spacing:.06em;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;box-shadow:0 2px 10px var(--acg)}
+.ai-btn:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 4px 16px var(--acg)}
+.ai-btn:active{transform:translateY(0)}
+
+/* INFO BOX */
+.ibox{background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);padding:11px 13px;font-size:10px;color:var(--t2);line-height:1.8;margin-top:12px;position:relative;overflow:hidden}
+.ibox::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--ac),var(--teal));border-radius:99px}
+.ibox strong{color:var(--t)}.tip{color:var(--gold);font-weight:700}
+
+/* ═══ PRIORITY ═══ */
+.pr-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);transition:background .15s}
+.pr-row:last-child{border-bottom:none}
+.pr-row:hover{background:var(--bg3);margin:0 -4px;padding:9px 4px;border-radius:var(--r1)}
+.pr-rank{font-family:var(--fd);font-size:18px;font-weight:800;color:var(--t3);width:28px;text-align:center;flex-shrink:0;line-height:1}
+.pr-rank.top{color:var(--gold)}
+.pr-info{flex:1;min-width:0}
+.pr-name{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t);margin-bottom:2px}
+.pr-why{font-size:10px;color:var(--t2);line-height:1.4}
+.pr-score{font-family:var(--fd);font-size:12px;font-weight:800;color:var(--ac);flex-shrink:0}
+.pr-bar{height:2px;background:var(--bg6);border-radius:99px;overflow:hidden;margin-top:4px}
+.pr-barf{height:100%;border-radius:99px;transition:width .5s}
+
+/* ═══ CALENDAR ═══ */
+.cal7{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px}
+.cday{background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);padding:8px 4px;text-align:center;transition:all .15s;cursor:default;position:relative;overflow:hidden}
+.cday.today{border-color:var(--ac);box-shadow:0 0 12px var(--acg)}
+.cday.today::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ac),var(--teal))}
+.cday.past{opacity:.45}
+.cday-lbl{font-family:var(--fd);font-size:8px;font-weight:800;color:var(--t3);letter-spacing:.08em;text-transform:uppercase}
+.cday-n{font-family:var(--fd);font-size:16px;font-weight:800;color:var(--t);margin:2px 0;line-height:1}
+.cday.today .cday-n{color:var(--ac)}
+.cday-dots{display:flex;justify-content:center;gap:2px;margin-top:3px;flex-wrap:wrap}
+.cdot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+
+/* ═══ MILESTONES ═══ */
+.ms-list{display:flex;flex-direction:column;gap:5px}
+.ms{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);transition:all .15s}
+.ms:hover{border-color:var(--b2)}
+.ms.done{border-color:rgba(54,214,116,.2);background:rgba(54,214,116,.04)}
+.ms-ico{font-size:16px;flex-shrink:0;line-height:1}
+.ms-i{flex:1;min-width:0}
+.ms-n{font-size:11px;font-weight:600;color:var(--t)}
+.ms-d{font-size:9px;color:var(--t3);margin-top:1px}
+.ms-s{font-size:10px;font-weight:700;flex-shrink:0}
+.ms.done .ms-s{color:var(--green)}.ms:not(.done) .ms-s{color:var(--t3)}
+.ms-prog{margin-top:5px}
+.ms-pbar{height:3px;background:var(--bg6);border-radius:99px;overflow:hidden;margin-top:2px}
+.ms-pfill{height:100%;border-radius:99px;background:var(--ac);transition:width .5s}
+
+/* ═══ STATS ═══ */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.stat-card{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r4);padding:18px;position:relative;overflow:hidden;transition:all .18s}
+.stat-card:hover{border-color:var(--b2);transform:translateY(-2px);box-shadow:var(--sh2)}
+.stat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.015),transparent);pointer-events:none}
+.stc-t{font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:12px}
+.stc-big{font-family:var(--fd);font-size:36px;font-weight:800;line-height:1;margin-bottom:4px;transition:color .3s}
+.stc-sub{font-size:11px;color:var(--t2)}
+.el-bk{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.el-row2{display:flex;align-items:center;gap:8px}
+.el-dot2{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.el-nm2{font-size:10px;color:var(--t2);width:85px}
+.el-tr2{flex:1;height:4px;background:var(--bg6);border-radius:99px;overflow:hidden}
+.el-f2{height:100%;border-radius:99px;transition:width .6s}
+.el-ct2{font-size:9px;color:var(--t3);min-width:30px;text-align:right;font-weight:600}
+
+/* HEATMAP */
+.hm-wrap{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px}
+.hm-cell{width:12px;height:12px;border-radius:2px;background:var(--bg5);transition:all .15s;cursor:default;flex-shrink:0}
+.hm-cell:hover{transform:scale(1.3)}
+
+/* ═══ SHOP ═══ */
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:11px}
+.scard{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r3);padding:14px;transition:all .15s}
+.scard:hover{border-color:var(--b2);transform:translateY(-2px);box-shadow:var(--sh2)}
+.sc-h{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.sc-ico{width:32px;height:32px;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sc-n{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t)}
+.sc-l{font-size:9px;color:var(--t3);margin-top:1px;display:flex;align-items:center;gap:2px}
+.sg{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-top:1px solid var(--b)}
+.sg-i{flex:1;min-width:0}
+.sg-n{font-size:11px;font-weight:600;color:var(--t)}
+.sg-c{font-size:9px;color:var(--t3);margin-top:1px}
+.sg-ap{font-size:9px;font-weight:700;color:var(--ac);margin-top:2px}
+.sg-p{font-size:12px;font-weight:800;color:var(--fons);flex-shrink:0;white-space:nowrap}
+.sg-p.free{color:var(--green)}.sg-p.exch{color:var(--ac)}.sg-p.na{color:var(--t3);font-size:9px;font-weight:500}
+.ustrip{background:linear-gradient(135deg,rgba(124,111,247,.06),rgba(240,184,66,.04));border:1px solid rgba(124,111,247,.14);border-radius:var(--r4);padding:14px;margin-bottom:18px;display:flex;gap:10px;flex-wrap:wrap}
+.ui{flex:1;min-width:175px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r3);padding:12px;transition:all .15s}
+.ui:hover{border-color:var(--b2)}
+.ui-n{font-family:var(--fd);font-size:12px;font-weight:800;color:var(--t);margin-bottom:3px}
+.ui-ap{font-family:var(--fd);font-size:19px;font-weight:800;color:var(--gold);line-height:1}
+.ui-ap span{font-size:10px;font-weight:500;color:var(--t2);font-family:var(--fb)}
+.ui-src{font-size:10px;color:var(--t3);margin-top:5px;line-height:1.7}
+
+/* ═══ PLAN LAYOUT ═══ */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.plan-grid,.calc-grid{grid-template-columns:1fr}}
+
+/* VIEW BTN */
+.vbtn{background:var(--acg);border:1px solid rgba(124,111,247,.3);color:var(--ac);border-radius:var(--r1);padding:4px 9px;font-size:10px;font-weight:800;cursor:pointer;font-family:var(--fd);letter-spacing:.04em;transition:all .15s;white-space:nowrap}
+.vbtn:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:10px}
+.search-inp{width:100%;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--t);font-size:12px;padding:8px 12px 8px 34px;font-family:var(--fb);transition:all .15s}
+.search-inp:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--acg)}
+.search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:15px;pointer-events:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:rgba(20,20,38,.95);backdrop-filter:blur(16px);border:1px solid var(--b2);border-radius:99px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--t);opacity:0;transition:all .28s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:9999;display:flex;align-items:center;gap:7px;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast i{color:var(--green)}
+
+/* RESPONSIVE */
+@media(max-width:600px){.chars-layout{grid-template-columns:1fr}.plan-grid,.calc-grid,.stat-grid{grid-template-columns:1fr}.hpill:nth-child(3){display:none}}
+@media(max-width:820px){.stat-3col{grid-template-columns:1fr!important}}
+
+</style>
+</head>
+<body>
+<div class="glow-bg"></div>
+<div class="z">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="logo">
+    <div class="logo-mark"><i class="ti ti-sparkles"></i></div>
+    <span class="logo-text">Bond Tracker</span>
+    <span class="logo-sub">· NTE</span>
+  </div>
+  <div class="hdr-right">
+    <div class="hpill gold"><i class="ti ti-gift" style="font-size:11px"></i>Hoy: <b id="hd">10</b>/10</div>
+    <div class="hpill ac"><i class="ti ti-users" style="font-size:11px"></i><b id="hp">0</b> activos</div>
+    <div class="hpill gr"><i class="ti ti-crown" style="font-size:11px"></i><b id="hm">0</b> MAX</div>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="tab on" onclick="sw('chars',this)"><i class="ti ti-users"></i>Personajes</button>
+  <button class="tab" onclick="sw('plan',this)"><i class="ti ti-calendar"></i>Planificador</button>
+  <button class="tab" onclick="sw('calc',this)"><i class="ti ti-calculator"></i>Calculadora</button>
+  <button class="tab" onclick="sw('stats',this)"><i class="ti ti-chart-bar"></i>Estadísticas</button>
+  <button class="tab" onclick="sw('shop',this)"><i class="ti ti-building-store"></i>Tiendas</button>
+  <button class="tab" onclick="sw('fishing',this)"><i class="ti ti-fish"></i>Guía Pesca</button>
+</nav>
+
+<!-- ═══ CHARS ═══ -->
+<div id="tab-chars" class="pnl on">
+  <div class="chars-layout">
+    <div>
+      <!-- DAILY STRIP -->
+      <div class="dstrip">
+        <div class="ds"><div class="dsn" id="ds-left" style="color:var(--ac)">10</div><div class="dsl">Disponibles</div></div>
+        <div class="ds-sep"></div>
+        <div class="ds"><div class="dsn" id="ds-used" style="color:var(--t2)">0</div><div class="dsl">Usados</div></div>
+        <div class="ds-sep"></div>
+        <div class="ds"><div class="dsn" id="ds-chars" style="color:var(--green)">0</div><div class="dsl">PJ regalados</div></div>
+        <div class="ds-sep"></div>
+        <div class="ds-prog">
+          <div class="ds-pt"><span>Regalos diarios</span><span id="ds-pct">0%</span></div>
+          <div class="ds-bar"><div class="ds-fill" id="ds-fill" style="width:0%"></div></div>
+        </div>
+        <div class="ds-sep"></div>
+        <button class="rbtn" style="width:auto;padding:5px 12px;flex-shrink:0" onclick="resetDay()"><i class="ti ti-refresh"></i>Reset</button>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="search-wrap">
+        <i class="ti ti-search search-ico"></i>
+        <input class="search-inp" type="text" placeholder="Buscar personaje o elemento…" oninput="onSearch(this.value)">
+      </div>
+
+      <!-- FILTERS -->
+      <div class="fbar" id="fbar">
+        <button class="chip on" onclick="sf('all',this)"><i class="ti ti-layout-grid"></i>Todos</button>
+        <button class="chip eco" onclick="sf('Cosmos',this)">✦ Cosmos</button>
+        <button class="chip ean" onclick="sf('Anima',this)">✦ Anima</button>
+        <button class="chip ein" onclick="sf('Incantation',this)">✦ Incant.</button>
+        <button class="chip ech" onclick="sf('Chaos',this)">✦ Chaos</button>
+        <button class="chip eps" onclick="sf('Psyche',this)">✦ Psyche</button>
+        <button class="chip ela" onclick="sf('Lakshana',this)">✦ Lakshana</button>
+        <button class="chip" onclick="sf('rar-S',this)" style="color:var(--gold)">★ S-Rank</button>
+        <button class="chip" onclick="sf('rar-A',this)" style="color:var(--ac)">★ A-Rank</button>
+        <button class="chip" onclick="sf('active',this)"><i class="ti ti-activity"></i>Con progreso</button>
+        <button class="chip" onclick="sf('todo',this)"><i class="ti ti-clock"></i>Incompletos</button>
+        <button class="chip" onclick="sf('ready',this)"><i class="ti ti-gift"></i>Listos para regalar</button>
+      </div>
+
+      <div class="sec">
+        <span class="sec-t">Roster</span>
+        <span class="sec-n" id="rc">16 PJ</span>
+      </div>
+      <div class="cgrid" id="cgrid"></div>
+    </div>
+
+    <!-- DETAIL -->
+    <div class="dp-sticky">
+      <div class="dp" id="detail">
+        <div class="dp-empty">
+          <i class="ti ti-heart-handshake"></i>
+          <p>Seleccioná un personaje<br>para ver su vínculo, regalos<br>y ruta óptima hacia el MAX</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PLANIFICADOR ═══ -->
+<div id="tab-plan" class="pnl">
+  <div class="plan-grid">
+    <div>
+      <div class="sec"><span class="sec-t">Calendario — Próximos 7 días</span></div>
+      <div class="cal7" id="calgrid"></div>
+      <div class="box">
+        <div class="box-t"><i class="ti ti-podium"></i>Prioridad recomendada</div>
+        <div id="prio-list"></div>
+        <div class="ibox" style="margin-top:12px">
+          <strong>Score</strong> = % del nivel actual × bonus rareza (S=1.3×, A=1×). Prioriza PJ más cerca de subir de nivel con regalos económicos.
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="box" style="margin-bottom:14px">
+        <div class="box-t"><i class="ti ti-route"></i>Rutina óptima de hoy</div>
+        <div id="daily-plan"></div>
+      </div>
+      <div class="box">
+        <div class="box-t"><i class="ti ti-trophy"></i>Milestones</div>
+        <div class="ms-list" id="ms-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CALCULADORA ═══ -->
+<div id="tab-calc" class="pnl">
+  <div class="calc-grid">
+    <div>
+      <div class="box">
+        <div class="box-t"><i class="ti ti-calculator"></i>Calculadora de progreso</div>
+        <div class="fr">
+          <label>Personaje</label>
+          <select id="cc" onchange="syncCalcFromChar();rc2()"></select>
+        </div>
+        <div class="fr2">
+          <div class="fr">
+            <label>AP totales actuales <span id="calc-lv-ind" style="color:var(--ac);font-size:10px;font-weight:700;letter-spacing:0;text-transform:none;font-family:var(--fb)"></span></label>
+            <input type="number" id="cap" min="0" max="56000" value="0" oninput="rc2()">
+          </div>
+          <div class="fr">
+            <label>Precio del regalo (Fons)</label>
+            <input type="number" id="cp" min="0" value="0" placeholder="0 = gratis" oninput="rc2()">
+          </div>
+        </div>
+        <div class="fr">
+          <label>Tipo de regalo</label>
+          <select id="cg" onchange="rc2()">
+            <option value="2000">Carta Escrita a Mano — 2.000 AP</option>
+            <option value="400" selected>Favorito alto — 400 AP</option>
+            <option value="200">Favorito medio — 200 AP</option>
+            <option value="100">Genérico / Ebisu Tower — 100 AP</option>
+          </select>
+        </div>
+        <div class="rgrid">
+          <div class="rcard cnt"><div class="rv" id="r-ap">—</div><div class="rl">AP restantes</div></div>
+          <div class="rcard days"><div class="rv" id="r-days">—</div><div class="rl">Días mínimos</div></div>
+          <div class="rcard fons"><div class="rv" id="r-fons">—</div><div class="rl">Fons totales</div></div>
+        </div>
+        <div class="tl-h">Comparativa por tipo de regalo</div>
+        <div id="tl"></div>
+        <div class="ibox">
+          <strong>3 regalos/día por PJ</strong> · 10 total entre todos los PJ.<br>
+          <span class="tip">💡</span> Concentrá los 10 regalos en 3–4 PJ para avanzar más rápido que repartirlos entre todos.<br>
+          <span class="tip">₣</span> Est. para maxear un PJ: <strong>800K–1.5M Fons</strong> comprando regalos de 400AP.
+        </div>
+        <div class="aibox">
+          <div class="ai-t"><i class="ti ti-sparkles"></i>Consejo IA personalizado</div>
+          <div class="ai-o" id="ai-o">Seleccioná un personaje y completá los datos para recibir un análisis personalizado.</div>
+          <button class="ai-btn" onclick="askAI()"><i class="ti ti-send"></i>Analizar y pedir consejo</button>
+        </div>
+      </div>
+    </div>
+    <div class="box">
+      <div class="box-t"><i class="ti ti-list-check"></i>Estado de todos los PJ <span style="cursor:pointer;color:var(--ac)" onclick="updSum()" title="Actualizar">↻</span></div>
+      <div id="all-sum"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ESTADÍSTICAS ═══ -->
+<div id="tab-stats" class="pnl">
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stc-t">AP totales acumulados</div>
+      <div class="stc-big" id="st-ap">0</div>
+      <div class="stc-sub">de 896.000 AP posibles (16 PJ × 56K)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stc-t">Progreso global</div>
+      <div class="stc-big" id="st-pct" style="color:var(--ac)">0%</div>
+      <div class="stc-sub" id="st-pct-s">0 / 16 PJ al máximo</div>
+    </div>
+    <div class="stat-card">
+      <div class="stc-t">Fons invertidos (estimado)</div>
+      <div class="stc-big" id="st-fons" style="color:var(--gold)">0</div>
+      <div class="stc-sub">asumiendo ~3.000₣ por regalo de 400AP</div>
+    </div>
+    <div class="stat-card">
+      <div class="stc-t">PJ más avanzado</div>
+      <div style="display:flex;align-items:center;gap:11px;margin-top:10px">
+        <div id="st-best-av" style="flex-shrink:0"></div>
+        <div>
+          <div style="font-family:var(--fd);font-size:17px;font-weight:800" id="st-best-n">—</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:2px" id="st-best-l"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="stat-3col" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+    <div class="stat-card">
+      <div class="stc-t">Progreso por elemento</div>
+      <div class="el-bk" id="el-bk"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stc-t">Actividad — últimos 30 días</div>
+      <div class="hm-wrap" id="hm" style="margin-top:10px"></div>
+      <div style="display:flex;gap:4px;align-items:center;margin-top:8px;font-size:9px;color:var(--t3)">
+        Menos <div class="hm-cell" style="background:var(--bg5)"></div><div class="hm-cell" style="background:rgba(124,111,247,.3)"></div><div class="hm-cell" style="background:rgba(124,111,247,.6)"></div><div class="hm-cell" style="background:var(--ac)"></div> Más
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stc-t">Milestones globales</div>
+      <div class="ms-list" id="gms" style="margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TIENDAS ═══ -->
+<div id="tab-shop" class="pnl">
+  <div class="sec"><span class="sec-t">Regalos universales</span></div>
+  <div class="ustrip">
+    <div class="ui">
+      <div class="ui-n">Carta Escrita a Mano</div>
+      <div class="ui-ap">2.000 <span>AP · todos los PJ</span></div>
+      <div class="ui-src"><strong style="color:var(--ac)">Sin costo en Fons</strong> · Warp Exchange Circle Bounty · Battle Pass rewards<br><em style="color:var(--gold)">⚠ Muy escasa — reservar para niv.5–6 donde más impacta</em></div>
+    </div>
+    <div class="ui">
+      <div class="ui-n">Algodón Esponjoso (Fluffy Cotton)</div>
+      <div class="ui-ap">400 <span>AP · casi todos · gratis</span></div>
+      <div class="ui-src"><strong style="color:var(--green)">Gratis</strong> · Anomalía en tu casa · ~20–25 unidades/mes<br><em style="color:var(--gold)">⚠ No usar en PJ con regalos baratos comprados (Skia, Narciso, Hotori)</em></div>
+    </div>
+    <div class="ui">
+      <div class="ui-n">Ebisu Royal Tower</div>
+      <div class="ui-ap">100 <span>AP · varios PJ · gratis</span></div>
+      <div class="ui-src"><strong style="color:var(--green)">Gratis (~40 unidades)</strong> · Misión historia Ebisu Auction<br>Útil como 3er regalo del día sin gastar Fons. Nanally, Jiuyuan, Hathor, Fadia, Aurelia, Adler, Hotori</div>
+    </div>
+  </div>
+  <div class="sec"><span class="sec-t">Tiendas por distrito</span></div>
+  <div class="shop-grid" id="sgrid"></div>
+</div>
+
+<!-- ═══ PESCA ═══ -->
+<div id="tab-fishing" class="pnl">
+
+  <!-- HERO BANNER -->
+  <div style="background:linear-gradient(135deg,rgba(91,168,255,0.12),rgba(47,207,187,0.08));border:1px solid rgba(91,168,255,0.2);border-radius:var(--r4);padding:22px 24px;margin-bottom:20px;position:relative;overflow:hidden">
+    <div style="position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:80px;opacity:0.06;pointer-events:none">🎣</div>
+    <div style="font-family:var(--fd);font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px">Sea Angler <span style="color:var(--teal)">· Guía completa</span></div>
+    <div style="font-size:12px;color:var(--t2);line-height:1.7;max-width:600px">Llegá al nivel 10 de pesca y desbloqueá el skin exclusivo para tu Appraiser. Esta guía combina datos de las fuentes oficiales con mi criterio propio para darte la ruta más eficiente.</div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:8px 14px;text-align:center">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--green)">10</div>
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Niveles</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:8px 14px;text-align:center">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--gold)">500</div>
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Annuliths totales</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:8px 14px;text-align:center">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--ac)">30</div>
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Expansion Cores</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:8px 14px;text-align:center">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--pink)">1 Skin</div>
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Appraiser outfit</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px">
+    <!-- LEFT COL -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- HOW TO UNLOCK -->
+      <div class="box">
+        <div class="box-t"><i class="ti ti-lock-open"></i>Cómo desbloquear la pesca</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2)">
+            <div style="width:22px;height:22px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--fd)">1</div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--t)">Llegar a City Tycoon Nivel 3</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:2px">Requiere 118.300 Fons acumulados en lifetime earnings</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2)">
+            <div style="width:22px;height:22px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--fd)">2</div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--t)">Tener un vehículo de 4 ruedas</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:2px">Completar la misión "Legendary Driver"</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2)">
+            <div style="width:22px;height:22px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--fd)">3</div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--t)">Tutorial Sea Angler</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:2px">Menu → City Tycoon → Hethereau Hobbies → Sea Angler → ir a un spot. Obtenés Fishing Rod I y 20× Universal Bait gratis.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPOTS -->
+      <div class="box">
+        <div class="box-t"><i class="ti ti-map-pin"></i>Los 8 spots de pesca</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r1);font-size:11px">
+            <span style="color:var(--t);font-weight:600">🏞 Caltrope Lake</span><span style="color:var(--t3);font-size:10px">Miguel District</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r1);font-size:11px">
+            <span style="color:var(--t);font-weight:600">🌊 Nautili Tunnel West</span><span style="color:var(--t3);font-size:10px">1 spot</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r1);font-size:11px">
+            <span style="color:var(--t);font-weight:600">⚓ Nautili Tunnel East</span><span style="color:var(--t3);font-size:10px">+ Cape Square + Stellar Marina (3 spots)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r1);font-size:11px">
+            <span style="color:var(--t);font-weight:600">🌧 Raindrop Court</span><span style="color:var(--t3);font-size:10px">1 spot</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r1);font-size:11px">
+            <span style="color:var(--t);font-weight:600">🌅 Azure Vista</span><span style="color:var(--t3);font-size:10px">+ Imaginist (2 spots)</span>
+          </div>
+          <div class="ibox" style="margin-top:4px">
+            <span class="tip">💡 Mi razonamiento:</span> Stellar Marina y Azure Vista son los mejores para peces épicos/legendarios por la variedad de especies. El handbook te dice exactamente qué hay en cada spot — usá el filtro "Daily Rec. Fishing Spot" para no perder tiempo.
+          </div>
+        </div>
+      </div>
+
+      <!-- BAIT LIST -->
+      <div class="box">
+        <div class="box-t"><i class="ti ti-egg"></i>Todos los cebos y qué pescan</div>
+        <div style="display:flex;flex-direction:column;gap:5px" id="bait-list">
+          <!-- JS fills this -->
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COL -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- LEVEL UP FAST - CORE GUIDE -->
+      <div class="box" style="border-color:rgba(124,111,247,0.3)">
+        <div class="box-t" style="color:var(--ac)"><i class="ti ti-rocket"></i>Cómo llegar al nivel 10 rápido</div>
+
+        <!-- Phase 1 -->
+        <div style="border-left:2px solid var(--ac);padding-left:12px;margin-bottom:14px">
+          <div style="font-family:var(--fd);font-size:11px;font-weight:800;color:var(--ac);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Fase 1 · Niv. 1→4 · "La base"</div>
+          <div style="font-size:11px;color:var(--t2);line-height:1.75">
+            Usá el <strong style="color:var(--t)">Universal Bait</strong> que te dan gratis. No gastes Scale Coins en cebos especiales todavía — el early game da poco EXP por pez de todas formas. Pescá en cualquier spot, vendé todo en el <strong style="color:var(--t)">Fish Hold</strong> (no el Fish Market aún). El objetivo es acumular Scale Coins para comprarte la <strong style="color:var(--gold)">Fishing Rod II</strong> lo antes posible.
+          </div>
+          <div style="margin-top:8px;padding:7px 10px;background:rgba(124,111,247,0.07);border-radius:var(--r1);font-size:10px;color:var(--t2)">
+            <span class="tip">📊 Mi cálculo:</span> La Fishing Rod II (blue) es el punto de quiebre real. Con ella podés aguantar peces de mayor stamina sin que se rompa la línea, lo que te abre el acceso a épicos que dan 3–5× más EXP.
+          </div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div style="border-left:2px solid var(--teal);padding-left:12px;margin-bottom:14px">
+          <div style="font-family:var(--fd);font-size:11px;font-weight:800;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Fase 2 · Niv. 4→7 · "Fish Market loop"</div>
+          <div style="font-size:11px;color:var(--t2);line-height:1.75">
+            Con la Rod II activa el loop diario: chequeá el <strong style="color:var(--t)">Fish Market</strong> al abrir el juego. Si los peces del día requieren cebo especializado que tenés, yendo al <em>Daily Rec. Fishing Spot</em> pescás directo los que dan +300%/+500%. Vendé las 2 unidades máximas al precio premium y el resto en Fish Hold. El bonus de escamas te permite comprar cebos especiales constantemente.
+          </div>
+          <div style="margin-top:8px;padding:7px 10px;background:rgba(47,207,187,0.07);border-radius:var(--r1);font-size:10px;color:var(--t2)">
+            <span class="tip">📊 Mi cálculo:</span> El Fish Market da hasta 5× Scale Coins. Si un pez común da 40 monedas, el mismo pez en demanda da 200. En 2 ventas diarias = 400 monedas extra que se reinvierten en cebo épico = más EXP = sube más rápido. Es el loop más eficiente del juego.
+          </div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div style="border-left:2px solid var(--gold);padding-left:12px">
+          <div style="font-family:var(--fd);font-size:11px;font-weight:800;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Fase 3 · Niv. 7→10 · "Épicos y legendarios"</div>
+          <div style="font-size:11px;color:var(--t2);line-height:1.75">
+            A partir del niv.7 desbloqueás cebos de alto nivel. Enfocate en <strong style="color:var(--t)">peces épicos (stamina 9) y legendarios (stamina 12)</strong> — dan un salto enorme en EXP. La Fishing Rod III o IV es casi obligatoria acá. Si encontrás el <strong style="color:var(--gold)">Fishing Mastery Guide</strong> (ítem S-Rank), usalo — es un boost de EXP masivo. También existe el <strong style="color:var(--ac)">Blazing Mahi-Mahi</strong> (cebo Worm) que es uno de los mejores en EXP por captura.
+          </div>
+          <div style="margin-top:8px;padding:7px 10px;background:rgba(240,184,66,0.07);border-radius:var(--r1);font-size:10px;color:var(--t2)">
+            <span class="tip">📊 Mi cálculo:</span> Stamina 6 = raro, 9 = épico, 12 = legendario. La diferencia de EXP entre común y legendario es aproximadamente 8–10×. Una sesión de 20 min cazando épicos > 2 horas pescando comunes. Priorizá calidad sobre cantidad.
+          </div>
+        </div>
+      </div>
+
+      <!-- ROD PROGRESSION -->
+      <div class="box">
+        <div class="box-t"><i class="ti ti-tools"></i>Progresión de cañas — cuándo comprar cada una</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2)">
+            <div style="width:8px;height:8px;border-radius:50%;background:#6b7280;flex-shrink:0"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:11px;font-weight:700;color:var(--t)">Fishing Rod I · Starter</div>
+              <div style="font-size:10px;color:var(--t3)">Gratis del tutorial · Solo peces comunes · Línea frágil</div>
+            </div>
+            <div style="font-size:10px;color:var(--t3);font-weight:600">Niv.1</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(91,168,255,0.07);border:1px solid rgba(91,168,255,0.2);border-radius:var(--r2)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:11px;font-weight:700;color:var(--t)">Fishing Rod II · Blue ⭐ <span style="color:var(--blue);font-size:9px">PRIORITÁ</span></div>
+              <div style="font-size:10px;color:var(--t2)">Primera compra obligatoria. Aguanta épicos sin romperse. Comprar con Scale Coins apenas tengás suficientes.</div>
+            </div>
+            <div style="font-size:10px;color:var(--blue);font-weight:700">Niv.2+</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.15);border-radius:var(--r2)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--ac);flex-shrink:0"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:11px;font-weight:700;color:var(--t)">Fishing Rod III · Purple</div>
+              <div style="font-size:10px;color:var(--t2)">Para legendarios. Línea mucho más resistente. Segunda prioridad.</div>
+            </div>
+            <div style="font-size:10px;color:var(--ac);font-weight:700">Niv.5+</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(240,184,66,0.07);border:1px solid rgba(240,184,66,0.15);border-radius:var(--r2)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:11px;font-weight:700;color:var(--t)">Fishing Rod IV · Gold</div>
+              <div style="font-size:10px;color:var(--t2)">Top tier. Hace los legendarios mucho más manejables. No es urgente pero es el objetivo final.</div>
+            </div>
+            <div style="font-size:10px;color:var(--gold);font-weight:700">Niv.7+</div>
+          </div>
+          <div class="ibox" style="margin-top:2px">
+            <span class="tip">💡 Criterio propio:</span> Conseguí la Rod II antes que cualquier cebo especial. La tentación es comprar cebos fancy, pero sin una caña decente la línea se rompe con épicos y perdés el pez (y el EXP). Rod II primero, siempre.
+          </div>
+        </div>
+      </div>
+
+      <!-- SKIN REWARD -->
+      <div class="box" style="border-color:rgba(255,110,180,0.3);background:linear-gradient(135deg,rgba(255,110,180,0.05),rgba(124,111,247,0.05))">
+        <div class="box-t" style="color:var(--pink)"><i class="ti ti-shirt"></i>Reward nivel 10 — Sea Angler Skin</div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+          <div style="width:64px;height:64px;border-radius:var(--r2);background:linear-gradient(135deg,rgba(255,110,180,0.2),rgba(124,111,247,0.2));border:1px solid rgba(255,110,180,0.3);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0">🎣</div>
+          <div>
+            <div style="font-family:var(--fd);font-size:14px;font-weight:800;color:var(--t);margin-bottom:3px">Sea Angler Outfit</div>
+            <div style="font-size:11px;color:var(--t2)">Skin exclusivo para el Appraiser (protagonista). No se puede obtener de ninguna otra forma.</div>
+            <div style="font-size:10px;color:var(--pink);margin-top:5px;font-weight:600">Solo disponible llegando al nivel 10 de Sea Angler</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--t2);line-height:1.75;margin-bottom:8px">Para previsualizar el skin antes de llegar al nivel 10: andá al menú de Sea Angler → buscá "Graffiti in Progress" → tocá el ícono de la lupa al lado. Podés ver exactamente cómo queda puesto.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);padding:10px;text-align:center">
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--green)">50</div>
+            <div style="font-size:9px;color:var(--t3)">Annuliths por nivel</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);padding:10px;text-align:center">
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--ac)">3</div>
+            <div style="font-size:9px;color:var(--t3)">Expansion Cores por nivel</div>
+          </div>
+        </div>
+        <div class="ibox" style="margin-top:10px">
+          <span class="tip">📊 Razonamiento:</span> 500 Annuliths totales equivalen a aprox. 6 pulls garantizados al canjear en el sistema de intercambio. Los 30 Expansion Cores son materiales de mejora de personajes. La pesca es literalmente free-to-play en recursos valiosos mientras jugás relajado.
+        </div>
+      </div>
+
+      <!-- DAILY ROUTINE -->
+      <div class="box">
+        <div class="box-t"><i class="ti ti-calendar-check"></i>Rutina diaria óptima de pesca</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 10px;background:var(--bg3);border-radius:var(--r1);border:1px solid var(--b)">
+            <div style="font-size:14px;flex-shrink:0">🌅</div>
+            <div><div style="font-size:11px;font-weight:600;color:var(--t)">Al abrir el juego</div><div style="font-size:10px;color:var(--t2);margin-top:1px">Chequeá el Fish Market. Fijate qué 3 peces están en demanda y con qué cebo se pescan (Algae/Bone, Shrimp, etc.)</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 10px;background:var(--bg3);border-radius:var(--r1);border:1px solid var(--b)">
+            <div style="font-size:14px;flex-shrink:0">🎯</div>
+            <div><div style="font-size:11px;font-weight:600;color:var(--t)">Paso 1: Vendé los 2 peces en demanda</div><div style="font-size:10px;color:var(--t2);margin-top:1px">Usá "Go to Daily Rec. Fishing Spot", pescá con el cebo correcto y vendé las 2 unidades al precio premium (+200% a +500%)</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 10px;background:var(--bg3);border-radius:var(--r1);border:1px solid var(--b)">
+            <div style="font-size:14px;flex-shrink:0">⚡</div>
+            <div><div style="font-size:11px;font-weight:600;color:var(--t)">Paso 2: Gastá City Stamina eficientemente</div><div style="font-size:10px;color:var(--t2);margin-top:1px">Vendé el resto del inventario en Fish Hold — consumís 1 Stamina por 1.000 Fons. Es una de las mejores formas de convertir Stamina en recursos.</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 10px;background:var(--bg3);border-radius:var(--r1);border:1px solid var(--b)">
+            <div style="font-size:14px;flex-shrink:0">🔄</div>
+            <div><div style="font-size:11px;font-weight:600;color:var(--t)">Paso 3: Reinvertí en mejor equipo</div><div style="font-size:10px;color:var(--t2);margin-top:1px">Con los Scale Coins ganados, comprá la siguiente caña o el cebo especializado del próximo nivel. Luna Bay también vende equipo de pesca.</div></div>
+          </div>
+        </div>
+        <div class="ibox" style="margin-top:10px">
+          <span class="tip">⏱ Tiempo estimado al nivel 10:</span> Con esta rutina diaria (Fish Market + épicos) podés llegar al niv.10 en <strong style="color:var(--t)">3–4 semanas</strong>. Sin el loop del Fish Market y pescando solo comunes, puede tardar 6–8 semanas. La diferencia es consistencia diaria, no horas de sesión.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FISHING TRACKER -->
+  <div class="box" style="margin-bottom:0">
+    <div class="box-t"><i class="ti ti-chart-line"></i>Mi progreso de pesca personal
+      <span style="margin-left:auto;font-size:10px;color:var(--t3);font-weight:500">Guardado localmente</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+      <div>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Nivel actual de pesca</label>
+        <div style="display:flex;gap:6px">
+          <input type="number" id="fish-lv" min="1" max="10" value="1" style="width:60px;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:14px;font-weight:700;padding:6px 8px;font-family:var(--fd)" oninput="updFishTracker()">
+          <div style="font-family:var(--fd);font-size:11px;color:var(--t2);display:flex;align-items:center">/ 10</div>
+        </div>
+      </div>
+      <div>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Caña actual</label>
+        <select id="fish-rod" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:11px;padding:6px 8px;font-family:var(--fb)" onchange="updFishTracker()">
+          <option value="1">Rod I · Starter (gris)</option>
+          <option value="2">Rod II · Blue ⭐</option>
+          <option value="3">Rod III · Purple</option>
+          <option value="4">Rod IV · Gold</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Método principal</label>
+        <select id="fish-method" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:11px;padding:6px 8px;font-family:var(--fb)" onchange="updFishTracker()">
+          <option value="casual">Solo comunes (Universal Bait)</option>
+          <option value="market">Loop Fish Market diario</option>
+          <option value="epic">Foco en épicos/legendarios</option>
+          <option value="optimal">Combinado (Market + épicos)</option>
+        </select>
+      </div>
+    </div>
+    <div id="fish-tracker-out" style="background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:14px;font-size:11px;color:var(--t2);line-height:1.8"></div>
+  </div>
+
+</div>
+
+</div><!-- /z -->
+
+<div class="toast" id="toast"><i class="ti ti-check"></i><span id="tmsg"></span></div>
+<script>
+
+const CHAR_PORTRAITS = {
+  'nanally': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZTg2MzJhIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjYzQ0ODIwIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZmNiYTAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmNiYTBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjZTg2MzJhIiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiNlMDYwMzAiIG9wYWNpdHk9IjAuODgiLz48cG9seWdvbiBwb2ludHM9IjE2LDE4IDIyLDYgMjgsMTgiIGZpbGw9IiNmZjhjNGEiIG9wYWNpdHk9IjAuOTUiLz48cG9seWdvbiBwb2ludHM9IjM4LDE2IDQ0LDUgNTAsMTYiIGZpbGw9IiNmZjhjNGEiIG9wYWNpdHk9IjAuOTUiLz48cG9seWdvbiBwb2ludHM9IjE4LDE4IDIyLDEwIDI2LDE4IiBmaWxsPSIjZmZkNzAwIiBvcGFjaXR5PSIwLjc1Ii8+PHBvbHlnb24gcG9pbnRzPSI0MCwxNiA0NCw4IDQ4LDE2IiBmaWxsPSIjZmZkNzAwIiBvcGFjaXR5PSIwLjc1Ii8+PHJlY3QgeD0iMzAiIHk9IjUzIiB3aWR0aD0iMTIiIGhlaWdodD0iMTAiIHJ4PSI0IiBmaWxsPSIjZmZjYmEwIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iNDAiIHJ4PSIxNCIgcnk9IjE1IiBmaWxsPSJ1cmwoI2ZjKSIvPjxlbGxpcHNlIGN4PSIzNiIgY3k9IjI1IiByeD0iMTYiIHJ5PSIxMiIgZmlsbD0iI2ZmOGM0YSIgb3BhY2l0eT0iMC44OCIvPjxwYXRoIGQ9Ik0yMSwyOSBRMjcsMTggMzYsMjEgUTQ1LDE4IDUxLDI5IFE0NywyMyAzNiwyNCBRMjUsMjMgMjEsMjkiIGZpbGw9IiNmZjhjNGEiIG9wYWNpdHk9IjAuOTYiLz48ZWxsaXBzZSBjeD0iMjguNSIgY3k9IjM5IiByeD0iNC41IiByeT0iNCIgZmlsbD0id2hpdGUiLz48ZWxsaXBzZSBjeD0iNDMuNSIgY3k9IjM5IiByeD0iNC41IiByeT0iNCIgZmlsbD0id2hpdGUiLz48ZWxsaXBzZSBjeD0iMjkiIGN5PSIzOSIgcng9IjMiIHJ5PSIzLjMiIGZpbGw9IiNmZjQwNDAiLz48ZWxsaXBzZSBjeD0iNDQiIGN5PSIzOSIgcng9IjMiIHJ5PSIzLjMiIGZpbGw9IiNmZjQwNDAiLz48Y2lyY2xlIGN4PSIyOS44IiBjeT0iMzgiIHI9IjEuNSIgZmlsbD0iIzBhMGExNCIvPjxjaXJjbGUgY3g9IjQ0LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iMzAuNiIgY3k9IjM3LjIiIHI9IjAuNzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkyIi8+PGNpcmNsZSBjeD0iNDUuNiIgY3k9IjM3LjIiIHI9IjAuNzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkyIi8+PHBhdGggZD0iTTI0LDM0LjUgUTI4LjUsMzIuNSAzMywzNC41IiBzdHJva2U9IiNlMDYwMzAiIHN0cm9rZS13aWR0aD0iMS42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzksMzQuNSBRNDMuNSwzMi41IDQ4LDM0LjUiIHN0cm9rZT0iI2UwNjAzMCIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iNDQiIHI9IjEuMiIgZmlsbD0iI2ZmY2JhMEJCIi8+PHBhdGggZD0iTTMxLDQ4IFEzNiw1Mi41IDQxLDQ4IiBzdHJva2U9IiNlMDYwMzAiIHN0cm9rZS13aWR0aD0iMS42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48ZWxsaXBzZSBjeD0iMjMiIGN5PSI0NCIgcng9IjQiIHJ5PSIyLjUiIGZpbGw9IiNmZjg4ODgiIG9wYWNpdHk9IjAuMzIiLz48ZWxsaXBzZSBjeD0iNDkiIGN5PSI0NCIgcng9IjQiIHJ5PSIyLjUiIGZpbGw9IiNmZjg4ODgiIG9wYWNpdHk9IjAuMzIiLz48Y2lyY2xlIGN4PSI1OSIgY3k9IjEzIiByPSIyLjIiIGZpbGw9IiNmZmQ3MDAiIG9wYWNpdHk9IjAuNzUiLz48Y2lyY2xlIGN4PSI1NSIgY3k9IjkiIHI9IjEuMyIgZmlsbD0iI2ZmZDcwMCIgb3BhY2l0eT0iMC41Ii8+PC9zdmc+',
+  'mint': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMjJjNTVlIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTZhMzRhIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZmQ0YjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmQ0YjBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjMjJjNTVlIiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiMyMmM1NWUiIG9wYWNpdHk9IjAuODgiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZmQ0YjAiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iIzAwZWU3NyIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iIzAwZWU3NyIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iIzIyYzU1ZSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjMjJjNTVlIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmZkNGIwQkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iIzIyYzU1ZSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iIzg2ZWZhYyIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjODZlZmFjIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+  'hathor': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWUyOTNiIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGYxNzJhIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmMGU2ZDAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmMGU2ZDBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjMWUyOTNiIiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiM5NGEzYjgiIG9wYWNpdHk9IjAuODgiLz48cGF0aCBkPSJNMTIsMjggUTIsMzMgNiw1MCBRMTMsNDMgMTYsNDggUTEwLDM3IDEyLDI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC40NSIvPjxlbGxpcHNlIGN4PSIxMCIgY3k9IjM4IiByeD0iOCIgcnk9IjE2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xOCIgdHJhbnNmb3JtPSJyb3RhdGUoLTE4LDEwLDM4KSIvPjxyZWN0IHg9IjMwIiB5PSI1MyIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwIiByeD0iNCIgZmlsbD0iI2YwZTZkMCIvPjxlbGxpcHNlIGN4PSIzNiIgY3k9IjQwIiByeD0iMTQiIHJ5PSIxNSIgZmlsbD0idXJsKCNmYykiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIyNSIgcng9IjE2IiByeT0iMTIiIGZpbGw9IiNlMmU4ZjAiIG9wYWNpdHk9IjAuODgiLz48cGF0aCBkPSJNMjEsMjkgUTI3LDE4IDM2LDIxIFE0NSwxOCA1MSwyOSBRNDcsMjMgMzYsMjQgUTI1LDIzIDIxLDI5IiBmaWxsPSIjZTJlOGYwIiBvcGFjaXR5PSIwLjk2Ii8+PGVsbGlwc2UgY3g9IjI4LjUiIGN5PSIzOSIgcng9IjQuNSIgcnk9IjQiIGZpbGw9IndoaXRlIi8+PGVsbGlwc2UgY3g9IjQzLjUiIGN5PSIzOSIgcng9IjQuNSIgcnk9IjQiIGZpbGw9IndoaXRlIi8+PGVsbGlwc2UgY3g9IjI5IiBjeT0iMzkiIHJ4PSIzIiByeT0iMy4zIiBmaWxsPSIjOTRhM2I4Ii8+PGVsbGlwc2UgY3g9IjQ0IiBjeT0iMzkiIHJ4PSIzIiByeT0iMy4zIiBmaWxsPSIjOTRhM2I4Ii8+PGNpcmNsZSBjeD0iMjkuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSI0NC44IiBjeT0iMzgiIHI9IjEuNSIgZmlsbD0iIzBhMGExNCIvPjxjaXJjbGUgY3g9IjMwLjYiIGN5PSIzNy4yIiByPSIwLjc1IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45MiIvPjxjaXJjbGUgY3g9IjQ1LjYiIGN5PSIzNy4yIiByPSIwLjc1IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45MiIvPjxwYXRoIGQ9Ik0yNCwzNC41IFEyOC41LDMyLjUgMzMsMzQuNSIgc3Ryb2tlPSIjOTRhM2I4IiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTM5LDM0LjUgUTQzLjUsMzIuNSA0OCwzNC41IiBzdHJva2U9IiM5NGEzYjgiIHN0cm9rZS13aWR0aD0iMS42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48Y2lyY2xlIGN4PSIzNiIgY3k9IjQ0IiByPSIxLjIiIGZpbGw9IiNmMGU2ZDBCQiIvPjxwYXRoIGQ9Ik0zMSw0OCBRMzYsNTIuNSA0MSw0OCIgc3Ryb2tlPSIjOTRhM2I4IiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGVsbGlwc2UgY3g9IjIzIiBjeT0iNDQiIHJ4PSI0IiByeT0iMi41IiBmaWxsPSIjZmY4ODg4IiBvcGFjaXR5PSIwLjMyIi8+PGVsbGlwc2UgY3g9IjQ5IiBjeT0iNDQiIHJ4PSI0IiByeT0iMi41IiBmaWxsPSIjZmY4ODg4IiBvcGFjaXR5PSIwLjMyIi8+PGNpcmNsZSBjeD0iNTkiIGN5PSIxMyIgcj0iMi4yIiBmaWxsPSIjZmJiZjI0IiBvcGFjaXR5PSIwLjc1Ii8+PGNpcmNsZSBjeD0iNTUiIGN5PSI5IiByPSIxLjMiIGZpbGw9IiNmYmJmMjQiIG9wYWNpdHk9IjAuNSIvPjwvc3ZnPg==',
+  'jiuyuan': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNWIyMWI2Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjM2IwNzY0Ii8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZGU4ZDAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZGU4ZDBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjNWIyMWI2IiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiM3YzNhZWQiIG9wYWNpdHk9IjAuODgiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIxOSIgcng9IjIxIiByeT0iNC41IiBmaWxsPSIjN2MzYWVkIiBvcGFjaXR5PSIwLjg4Ii8+PHJlY3QgeD0iMjUiIHk9IjExIiB3aWR0aD0iMjIiIGhlaWdodD0iMTAiIHJ4PSIzIiBmaWxsPSIjYTc4YmZhIiBvcGFjaXR5PSIwLjkiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZGU4ZDAiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjYTc4YmZhIiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iI2E3OGJmYSIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2MwODRmYyIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2MwODRmYyIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iIzdjM2FlZCIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjN2MzYWVkIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmRlOGQwQkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iIzdjM2FlZCIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iI2U5ZDVmZiIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjZTlkNWZmIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+  'hotori': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjYmUxODVkIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOWQxNzRkIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZmU0ZTYiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmU0ZTZDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjYmUxODVkIiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiNmYjcxODUiIG9wYWNpdHk9IjAuODgiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZmU0ZTYiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjZmRhNGFmIiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iI2ZkYTRhZiIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2Y5YThkNCIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2Y5YThkNCIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iI2ZiNzE4NSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjZmI3MTg1IiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmZlNGU2QkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iI2ZiNzE4NSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iI2ZjZTdmMyIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjZmNlN2YzIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+  'sakiri': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZGIyNzc3Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjYmUxODVkIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZmQ0ZTAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmQ0ZTBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjZGIyNzc3IiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiNlYzQ4OTkiIG9wYWNpdHk9IjAuODgiLz48cG9seWdvbiBwb2ludHM9IjQwLDEwIDQ0LDEgNDgsMTIiIGZpbGw9IiNmYmJmMjQiIG9wYWNpdHk9IjAuOTUiLz48bGluZSB4MT0iNDQiIHkxPSIyIiB4Mj0iNDQiIHkyPSIxMSIgc3Ryb2tlPSIjZmJiZjI0IiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iMC42Ii8+PHJlY3QgeD0iMzAiIHk9IjUzIiB3aWR0aD0iMTIiIGhlaWdodD0iMTAiIHJ4PSI0IiBmaWxsPSIjZmZkNGUwIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iNDAiIHJ4PSIxNCIgcnk9IjE1IiBmaWxsPSJ1cmwoI2ZjKSIvPjxlbGxpcHNlIGN4PSIzNiIgY3k9IjI1IiByeD0iMTYiIHJ5PSIxMiIgZmlsbD0iI2Y0NzJiNiIgb3BhY2l0eT0iMC44OCIvPjxwYXRoIGQ9Ik0yMSwyOSBRMjcsMTggMzYsMjEgUTQ1LDE4IDUxLDI5IFE0NywyMyAzNiwyNCBRMjUsMjMgMjEsMjkiIGZpbGw9IiNmNDcyYjYiIG9wYWNpdHk9IjAuOTYiLz48ZWxsaXBzZSBjeD0iMjguNSIgY3k9IjM5IiByeD0iNC41IiByeT0iNCIgZmlsbD0id2hpdGUiLz48ZWxsaXBzZSBjeD0iNDMuNSIgY3k9IjM5IiByeD0iNC41IiByeT0iNCIgZmlsbD0id2hpdGUiLz48ZWxsaXBzZSBjeD0iMjkiIGN5PSIzOSIgcng9IjMiIHJ5PSIzLjMiIGZpbGw9IiNmZjY5YjQiLz48ZWxsaXBzZSBjeD0iNDQiIGN5PSIzOSIgcng9IjMiIHJ5PSIzLjMiIGZpbGw9IiNmZjY5YjQiLz48Y2lyY2xlIGN4PSIyOS44IiBjeT0iMzgiIHI9IjEuNSIgZmlsbD0iIzBhMGExNCIvPjxjaXJjbGUgY3g9IjQ0LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iMzAuNiIgY3k9IjM3LjIiIHI9IjAuNzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkyIi8+PGNpcmNsZSBjeD0iNDUuNiIgY3k9IjM3LjIiIHI9IjAuNzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkyIi8+PHBhdGggZD0iTTI0LDM0LjUgUTI4LjUsMzIuNSAzMywzNC41IiBzdHJva2U9IiNlYzQ4OTkiIHN0cm9rZS13aWR0aD0iMS42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzksMzQuNSBRNDMuNSwzMi41IDQ4LDM0LjUiIHN0cm9rZT0iI2VjNDg5OSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iNDQiIHI9IjEuMiIgZmlsbD0iI2ZmZDRlMEJCIi8+PHBhdGggZD0iTTMxLDQ4IFEzNiw1Mi41IDQxLDQ4IiBzdHJva2U9IiNlYzQ4OTkiIHN0cm9rZS13aWR0aD0iMS42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48ZWxsaXBzZSBjeD0iMjMiIGN5PSI0NCIgcng9IjQiIHJ5PSIyLjUiIGZpbGw9IiNmZjg4ODgiIG9wYWNpdHk9IjAuMzIiLz48ZWxsaXBzZSBjeD0iNDkiIGN5PSI0NCIgcng9IjQiIHJ5PSIyLjUiIGZpbGw9IiNmZjg4ODgiIG9wYWNpdHk9IjAuMzIiLz48Y2lyY2xlIGN4PSI1OSIgY3k9IjEzIiByPSIyLjIiIGZpbGw9IiNmYmJmMjQiIG9wYWNpdHk9IjAuNzUiLz48Y2lyY2xlIGN4PSI1NSIgY3k9IjkiIHI9IjEuMyIgZmlsbD0iI2ZiYmYyNCIgb3BhY2l0eT0iMC41Ii8+PC9zdmc+',
+  'edgar': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNDMzOGNhIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMzczMGEzIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZGU4ZDAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZGU4ZDBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjNDMzOGNhIiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiM2MzY2ZjEiIG9wYWNpdHk9IjAuODgiLz48cmVjdCB4PSIxOSIgeT0iMzUiIHdpZHRoPSIxMiIgaGVpZ2h0PSI3IiByeD0iMy41IiBmaWxsPSJub25lIiBzdHJva2U9IiNjN2QyZmUiIHN0cm9rZS13aWR0aD0iMS44IiBvcGFjaXR5PSIwLjg1Ii8+PHJlY3QgeD0iMzMiIHk9IjM1IiB3aWR0aD0iMTIiIGhlaWdodD0iNyIgcng9IjMuNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzdkMmZlIiBzdHJva2Utd2lkdGg9IjEuOCIgb3BhY2l0eT0iMC44NSIvPjxsaW5lIHgxPSIzMSIgeTE9IjM4LjUiIHgyPSIzMyIgeTI9IjM4LjUiIHN0cm9rZT0iI2M3ZDJmZSIgc3Ryb2tlLXdpZHRoPSIxLjUiIG9wYWNpdHk9IjAuODUiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZGU4ZDAiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjODE4Y2Y4IiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iIzgxOGNmOCIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2E1YjRmYyIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2E1YjRmYyIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iIzYzNjZmMSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjNjM2NmYxIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmRlOGQwQkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iIzYzNjZmMSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iI2M3ZDJmZSIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjYzdkMmZlIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+  'aurelia': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWQ0ZWQ4Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMWU0MGFmIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZWYzYzciLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZWYzYzdDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjMWQ0ZWQ4IiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiM2MGE1ZmEiIG9wYWNpdHk9IjAuODgiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZWYzYzciLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjOTNjNWZkIiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iIzkzYzVmZCIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iIzYwYTVmYSIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iIzYwYTVmYSIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iIzYwYTVmYSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjNjBhNWZhIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmVmM2M3QkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iIzYwYTVmYSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iI2JmZGJmZSIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjYmZkYmZlIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+  'adler': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMGY3NjZlIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGQ1YzU0Ii8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZGU4YzgiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZGU4YzhDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjMGY3NjZlIiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiM0YjU1NjMiIG9wYWNpdHk9IjAuODgiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZGU4YzgiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjNmI3MjgwIiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iIzZiNzI4MCIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iIzJkZDRiZiIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iIzJkZDRiZiIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iIzRiNTU2MyIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjNGI1NTYzIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmRlOGM4QkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iIzRiNTU2MyIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iIzk5ZjZlNCIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjOTlmNmU0IiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+  'chiz': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjN2UyMmNlIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNmIyMWE4Ii8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZmQ0ZjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmQ0ZjBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjN2UyMmNlIiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiNjMDg0ZmMiIG9wYWNpdHk9IjAuODgiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZmQ0ZjAiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjZDhiNGZlIiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iI2Q4YjRmZSIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2U4NzlmOSIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2U4NzlmOSIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iI2MwODRmYyIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjYzA4NGZjIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmZkNGYwQkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iI2MwODRmYyIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iI2YwYWJmYyIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjZjBhYmZjIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+  'baicang': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDc1OTg1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGM0YTZlIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZGU4ZDAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZGU4ZDBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjMDc1OTg1IiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiNjYmQ1ZTEiIG9wYWNpdHk9IjAuODgiLz48cmVjdCB4PSIxOCIgeT0iNDQiIHdpZHRoPSI1IiBoZWlnaHQ9IjIwIiByeD0iMi41IiBmaWxsPSIjY2JkNWUxIiBvcGFjaXR5PSIwLjg1Ii8+PHJlY3QgeD0iNDkiIHk9IjQ0IiB3aWR0aD0iNSIgaGVpZ2h0PSIyMCIgcng9IjIuNSIgZmlsbD0iI2NiZDVlMSIgb3BhY2l0eT0iMC44NSIvPjxyZWN0IHg9IjMwIiB5PSI1MyIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwIiByeD0iNCIgZmlsbD0iI2ZkZThkMCIvPjxlbGxpcHNlIGN4PSIzNiIgY3k9IjQwIiByeD0iMTQiIHJ5PSIxNSIgZmlsbD0idXJsKCNmYykiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIyNSIgcng9IjE2IiByeT0iMTIiIGZpbGw9IiNlMmU4ZjAiIG9wYWNpdHk9IjAuODgiLz48cGF0aCBkPSJNMjEsMjkgUTI3LDE4IDM2LDIxIFE0NSwxOCA1MSwyOSBRNDcsMjMgMzYsMjQgUTI1LDIzIDIxLDI5IiBmaWxsPSIjZTJlOGYwIiBvcGFjaXR5PSIwLjk2Ii8+PGVsbGlwc2UgY3g9IjI4LjUiIGN5PSIzOSIgcng9IjQuNSIgcnk9IjQiIGZpbGw9IndoaXRlIi8+PGVsbGlwc2UgY3g9IjQzLjUiIGN5PSIzOSIgcng9IjQuNSIgcnk9IjQiIGZpbGw9IndoaXRlIi8+PGVsbGlwc2UgY3g9IjI5IiBjeT0iMzkiIHJ4PSIzIiByeT0iMy4zIiBmaWxsPSIjMzhiZGY4Ii8+PGVsbGlwc2UgY3g9IjQ0IiBjeT0iMzkiIHJ4PSIzIiByeT0iMy4zIiBmaWxsPSIjMzhiZGY4Ii8+PGNpcmNsZSBjeD0iMjkuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSI0NC44IiBjeT0iMzgiIHI9IjEuNSIgZmlsbD0iIzBhMGExNCIvPjxjaXJjbGUgY3g9IjMwLjYiIGN5PSIzNy4yIiByPSIwLjc1IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45MiIvPjxjaXJjbGUgY3g9IjQ1LjYiIGN5PSIzNy4yIiByPSIwLjc1IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45MiIvPjxwYXRoIGQ9Ik0yNCwzNC41IFEyOC41LDMyLjUgMzMsMzQuNSIgc3Ryb2tlPSIjY2JkNWUxIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTM5LDM0LjUgUTQzLjUsMzIuNSA0OCwzNC41IiBzdHJva2U9IiNjYmQ1ZTEiIHN0cm9rZS13aWR0aD0iMS42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48Y2lyY2xlIGN4PSIzNiIgY3k9IjQ0IiByPSIxLjIiIGZpbGw9IiNmZGU4ZDBCQiIvPjxwYXRoIGQ9Ik0zMSw0OCBRMzYsNTIuNSA0MSw0OCIgc3Ryb2tlPSIjY2JkNWUxIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGVsbGlwc2UgY3g9IjIzIiBjeT0iNDQiIHJ4PSI0IiByeT0iMi41IiBmaWxsPSIjZmY4ODg4IiBvcGFjaXR5PSIwLjMyIi8+PGVsbGlwc2UgY3g9IjQ5IiBjeT0iNDQiIHJ4PSI0IiByeT0iMi41IiBmaWxsPSIjZmY4ODg4IiBvcGFjaXR5PSIwLjMyIi8+PGNpcmNsZSBjeD0iNTkiIGN5PSIxMyIgcj0iMi4yIiBmaWxsPSIjZmYzMzMzIiBvcGFjaXR5PSIwLjc1Ii8+PGNpcmNsZSBjeD0iNTUiIGN5PSI5IiByPSIxLjMiIGZpbGw9IiNmZjMzMzMiIG9wYWNpdHk9IjAuNSIvPjwvc3ZnPg==',
+  'fadia': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjYzI0MTBjIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOWEzNDEyIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZmQ0YjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmQ0YjBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjYzI0MTBjIiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiNmYjkyM2MiIG9wYWNpdHk9IjAuODgiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZmQ0YjAiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjZmRiYTc0IiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iI2ZkYmE3NCIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2ZiOTIzYyIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2ZiOTIzYyIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iI2ZiOTIzYyIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjZmI5MjNjIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmZkNGIwQkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iI2ZiOTIzYyIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iI2ZlZDdhYSIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjZmVkN2FhIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+  'skia': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMzc0MTUxIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMWYyOTM3Ii8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNlNWQ1YzAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlNWQ1YzBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjMzc0MTUxIiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiM2YjcyODAiIG9wYWNpdHk9IjAuODgiLz48cG9seWdvbiBwb2ludHM9IjE5LDIwIDI0LDggMzEsMjEiIGZpbGw9IiM5Y2EzYWYiIG9wYWNpdHk9IjAuOTIiLz48cG9seWdvbiBwb2ludHM9IjQxLDE5IDQ4LDcgNTMsMjAiIGZpbGw9IiM5Y2EzYWYiIG9wYWNpdHk9IjAuOTIiLz48cG9seWdvbiBwb2ludHM9IjIxLDIwIDI0LDEyIDI5LDIwIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC40NSIvPjxwb2x5Z29uIHBvaW50cz0iNDMsMTkgNDgsMTAgNTEsMTkiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjQ1Ii8+PHJlY3QgeD0iMzAiIHk9IjUzIiB3aWR0aD0iMTIiIGhlaWdodD0iMTAiIHJ4PSI0IiBmaWxsPSIjZTVkNWMwIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iNDAiIHJ4PSIxNCIgcnk9IjE1IiBmaWxsPSJ1cmwoI2ZjKSIvPjxlbGxpcHNlIGN4PSIzNiIgY3k9IjI1IiByeD0iMTYiIHJ5PSIxMiIgZmlsbD0iIzljYTNhZiIgb3BhY2l0eT0iMC44OCIvPjxwYXRoIGQ9Ik0yMSwyOSBRMjcsMTggMzYsMjEgUTQ1LDE4IDUxLDI5IFE0NywyMyAzNiwyNCBRMjUsMjMgMjEsMjkiIGZpbGw9IiM5Y2EzYWYiIG9wYWNpdHk9IjAuOTYiLz48ZWxsaXBzZSBjeD0iMjguNSIgY3k9IjM5IiByeD0iNC41IiByeT0iNCIgZmlsbD0id2hpdGUiLz48ZWxsaXBzZSBjeD0iNDMuNSIgY3k9IjM5IiByeD0iNC41IiByeT0iNCIgZmlsbD0id2hpdGUiLz48ZWxsaXBzZSBjeD0iMjkiIGN5PSIzOSIgcng9IjMiIHJ5PSIzLjMiIGZpbGw9IiM5NGEzYjgiLz48ZWxsaXBzZSBjeD0iNDQiIGN5PSIzOSIgcng9IjMiIHJ5PSIzLjMiIGZpbGw9IiM5NGEzYjgiLz48Y2lyY2xlIGN4PSIyOS44IiBjeT0iMzgiIHI9IjEuNSIgZmlsbD0iIzBhMGExNCIvPjxjaXJjbGUgY3g9IjQ0LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iMzAuNiIgY3k9IjM3LjIiIHI9IjAuNzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkyIi8+PGNpcmNsZSBjeD0iNDUuNiIgY3k9IjM3LjIiIHI9IjAuNzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkyIi8+PHBhdGggZD0iTTI0LDM0LjUgUTI4LjUsMzIuNSAzMywzNC41IiBzdHJva2U9IiM2YjcyODAiIHN0cm9rZS13aWR0aD0iMS42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzksMzQuNSBRNDMuNSwzMi41IDQ4LDM0LjUiIHN0cm9rZT0iIzZiNzI4MCIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iNDQiIHI9IjEuMiIgZmlsbD0iI2U1ZDVjMEJCIi8+PHBhdGggZD0iTTMxLDQ4IFEzNiw1Mi41IDQxLDQ4IiBzdHJva2U9IiM2YjcyODAiIHN0cm9rZS13aWR0aD0iMS42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48ZWxsaXBzZSBjeD0iMjMiIGN5PSI0NCIgcng9IjQiIHJ5PSIyLjUiIGZpbGw9IiNmZjg4ODgiIG9wYWNpdHk9IjAuMzIiLz48ZWxsaXBzZSBjeD0iNDkiIGN5PSI0NCIgcng9IjQiIHJ5PSIyLjUiIGZpbGw9IiNmZjg4ODgiIG9wYWNpdHk9IjAuMzIiLz48Y2lyY2xlIGN4PSI1OSIgY3k9IjEzIiByPSIyLjIiIGZpbGw9IiNlNWU3ZWIiIG9wYWNpdHk9IjAuNzUiLz48Y2lyY2xlIGN4PSI1NSIgY3k9IjkiIHI9IjEuMyIgZmlsbD0iI2U1ZTdlYiIgb3BhY2l0eT0iMC41Ii8+PC9zdmc+',
+  'daffodil': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjYTE2MjA3Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjODU0ZDBlIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZGU4ZDAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZGU4ZDBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjYTE2MjA3IiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiMxNjIxM2UiIG9wYWNpdHk9IjAuODgiLz48cGF0aCBkPSJNMjYsMTYgUTMxLDEwIDM2LDE1IFEzNywyMSAzNCwyMyBRMzEsMTYgMjYsMTYiIGZpbGw9IiMzYjgyZjYiIG9wYWNpdHk9IjAuNzIiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZGU4ZDAiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjMWExYTJlIiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iIzFhMWEyZSIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2ZiYmYyNCIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2ZiYmYyNCIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iIzE2MjEzZSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjMTYyMTNlIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmRlOGQwQkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iIzE2MjEzZSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iI2ZlZjA4YSIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjZmVmMDhhIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+  'narciso': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMTU4MDNkIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTY2NTM0Ii8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZmQ0YjgiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmQ0YjhDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjMTU4MDNkIiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuODgiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZmQ0YjgiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjODZlZmFjIiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iIzg2ZWZhYyIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iIzRhZGU4MCIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iIzRhZGU4MCIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjNGFkZTgwIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmZkNGI4QkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iI2QxZmFlNSIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjZDFmYWU1IiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+  'haniel': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MiA3MiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjM1JSIgcj0iNjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjYjQ1MzA5Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOTI0MDBlIi8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9ImZjIiBjeD0iNTAlIiBjeT0iNDUlIiByPSI1NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZGU4ZDAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZGU4ZDBDQyIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iMzYiIHI9IjM2IiBmaWxsPSIjYjQ1MzA5IiBvcGFjaXR5PSIwLjEiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSIzMCIgcng9IjE3IiByeT0iMjAiIGZpbGw9IiNmNTllMGIiIG9wYWNpdHk9IjAuODgiLz48cmVjdCB4PSIzMCIgeT0iNTMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNmZGU4ZDAiLz48ZWxsaXBzZSBjeD0iMzYiIGN5PSI0MCIgcng9IjE0IiByeT0iMTUiIGZpbGw9InVybCgjZmMpIi8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMjUiIHJ4PSIxNiIgcnk9IjEyIiBmaWxsPSIjZmNkMzRkIiBvcGFjaXR5PSIwLjg4Ii8+PHBhdGggZD0iTTIxLDI5IFEyNywxOCAzNiwyMSBRNDUsMTggNTEsMjkgUTQ3LDIzIDM2LDI0IFEyNSwyMyAyMSwyOSIgZmlsbD0iI2ZjZDM0ZCIgb3BhY2l0eT0iMC45NiIvPjxlbGxpcHNlIGN4PSIyOC41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSI0My41IiBjeT0iMzkiIHJ4PSI0LjUiIHJ5PSI0IiBmaWxsPSJ3aGl0ZSIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2ZiYmYyNCIvPjxlbGxpcHNlIGN4PSI0NCIgY3k9IjM5IiByeD0iMyIgcnk9IjMuMyIgZmlsbD0iI2ZiYmYyNCIvPjxjaXJjbGUgY3g9IjI5LjgiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMGEwYTE0Ii8+PGNpcmNsZSBjeD0iNDQuOCIgY3k9IjM4IiByPSIxLjUiIGZpbGw9IiMwYTBhMTQiLz48Y2lyY2xlIGN4PSIzMC42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48Y2lyY2xlIGN4PSI0NS42IiBjeT0iMzcuMiIgcj0iMC43NSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOTIiLz48cGF0aCBkPSJNMjQsMzQuNSBRMjguNSwzMi41IDMzLDM0LjUiIHN0cm9rZT0iI2Y1OWUwYiIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0zOSwzNC41IFE0My41LDMyLjUgNDgsMzQuNSIgc3Ryb2tlPSIjZjU5ZTBiIiBzdHJva2Utd2lkdGg9IjEuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMzYiIGN5PSI0NCIgcj0iMS4yIiBmaWxsPSIjZmRlOGQwQkIiLz48cGF0aCBkPSJNMzEsNDggUTM2LDUyLjUgNDEsNDgiIHN0cm9rZT0iI2Y1OWUwYiIgc3Ryb2tlLXdpZHRoPSIxLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSIyMyIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSI0OSIgY3k9IjQ0IiByeD0iNCIgcnk9IjIuNSIgZmlsbD0iI2ZmODg4OCIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU5IiBjeT0iMTMiIHI9IjIuMiIgZmlsbD0iI2ZlZjNjNyIgb3BhY2l0eT0iMC43NSIvPjxjaXJjbGUgY3g9IjU1IiBjeT0iOSIgcj0iMS4zIiBmaWxsPSIjZmVmM2M3IiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=',
+};
+
+
+const CHARS = [
+// ── Nanally ── Anima · S · most expensive to max (no cheap gifts) → use Fluffy Cotton
+{id:'nanally',name:'Nanally',rar:'S',el:'Anima',role:'DPS',col:'#e27241',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/e/e8/Nanally_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis ~20-25/mes)',pn:'Gratis',rar:'blue'},
+  {name:'Blazing Crimson',ap:400,price:4000,src:'Hillside Blooms Florist',pn:'4.000 ₣',rar:'purple'},
+  {name:'Kokoro Rider L1',ap:400,price:null,src:'Tienda Ebisu',pn:'Precio no confirmado',rar:'purple'},
+  {name:'Ebisu Royal Tower',ap:100,price:0,src:'Misión Ebisu Auction (gratis ~40 und.)',pn:'Gratis',rar:'green'},
+ ]},
+// ── Mint ── Anima · A
+{id:'mint',name:'Mint',rar:'A',el:'Anima',role:'DPS',col:'#4ade80',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/6/6d/Mint_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Waltz',ap:200,price:2000,src:'Tienda de música / DSD POP',pn:'~2.000 ₣',rar:'blue'},
+  {name:'Asahi Inori – Moonsilver',ap:400,price:null,src:'DSD POP, New Herland District',pn:'Gacha de figuras (no Fons)',rar:'gold'},
+  {name:'Entrada Cine Floe',ap:400,price:3000,src:'Kiosko Floe Cinema',pn:'~3.000 ₣',rar:'blue'},
+  {name:'Kids Energy Meal',ap:100,price:1200,src:'Máquinas expendedoras',pn:'~1.200 ₣',rar:'green'},
+ ]},
+// ── Aurelia ── Psyche · A
+{id:'aurelia',name:'Aurelia',rar:'A',el:'Psyche',role:'DPS',col:'#60a5fa',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/f/f1/Aurelia_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Blue Fable',ap:400,price:4000,src:'Oops! Chest Gift Shop',pn:'~4.000 ₣',rar:'blue'},
+  {name:'Luz Nocturna Ambiental',ap:200,price:2500,src:'Tienda de decoración',pn:'~2.500 ₣',rar:'green'},
+  {name:'Ebisu Royal Tower',ap:100,price:0,src:'Misión Ebisu Auction (gratis)',pn:'Gratis',rar:'green'},
+ ]},
+// ── Edgar ── Cosmos · A · único healer
+{id:'edgar',name:'Edgar',rar:'A',el:'Cosmos',role:'Survival / Healer',col:'#8b7cf8',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/d/d2/Edgar_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:"Boss' Approval",ap:400,price:-1,src:'Warp Exchange (canjeable)',pn:'Canjeable (no Fons)',rar:'purple'},
+  {name:'Blue Fable',ap:400,price:4000,src:'Oops! Chest Gift Shop',pn:'~4.000 ₣',rar:'blue'},
+ ]},
+// ── Sakiri ── Lakshana · S
+{id:'sakiri',name:'Sakiri',rar:'S',el:'Lakshana',role:'DPS',col:'#f472b6',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/a/a5/Sakiri_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Bunny Box',ap:400,price:20000,src:'Brown Electronics (Bridge Crossings / Miguel)',pn:'20.000 ₣ ⚠ Caro',rar:'gold'},
+  {name:'Blue Fable',ap:400,price:4000,src:'Oops! Chest Gift Shop',pn:'~4.000 ₣',rar:'blue'},
+  {name:'Fever Dream',ap:400,price:5000,src:'Oops! Chest Gift Shop',pn:'5.000 ₣',rar:'purple'},
+  {name:'Kids Energy Meal',ap:100,price:1200,src:'Máquinas expendedoras',pn:'~1.200 ₣',rar:'green'},
+ ]},
+// ── Haniel ── Psyche · A
+{id:'haniel',name:'Haniel',rar:'A',el:'Psyche',role:'Buffer',col:'#f0b842',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/0/0f/Haniel_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Puka Chocoa Ellie Tour Special',ap:400,price:3500,src:'Puka Candy Shop / Vending Machine',pn:'~3.500 ₣',rar:'blue'},
+  {name:'Asahi Inori – Moonsilver',ap:400,price:null,src:'DSD POP, New Herland District',pn:'Gacha de figuras',rar:'gold'},
+ ]},
+// ── Hathor ── Lakshana · S
+{id:'hathor',name:'Hathor',rar:'S',el:'Lakshana',role:'DPS',col:'#34d399',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/c/c8/Hathor_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Fever Dream',ap:400,price:5000,src:'Oops! Chest Gift Shop',pn:'5.000 ₣',rar:'purple'},
+  {name:'Refrescante Cooly Cool',ap:200,price:1800,src:'Máquinas expendedoras / tiendas',pn:'~1.800 ₣',rar:'green'},
+  {name:'Ebisu Royal Tower',ap:100,price:0,src:'Misión Ebisu Auction (gratis)',pn:'Gratis',rar:'green'},
+ ]},
+// ── Jiuyuan ── Anima · S
+{id:'jiuyuan',name:'Jiuyuan',rar:'S',el:'Anima',role:'DPS Burst',col:'#a78bfa',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/3/32/Jiuyuan_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Sakai Melon Bread',ap:400,price:2000,src:"Alice's Bakery (zona gastronómica)",pn:'~2.000 ₣',rar:'green'},
+  {name:'Sonata del Ruiseñor',ap:400,price:null,src:'Tienda de música',pn:'Precio no confirmado',rar:'purple'},
+  {name:'Ebisu Royal Tower',ap:100,price:0,src:'Misión Ebisu Auction (gratis)',pn:'Gratis',rar:'green'},
+ ]},
+// ── Adler ── Incantation · A
+{id:'adler',name:'Adler',rar:'A',el:'Incantation',role:'Survival / Tank',col:'#2dd4bf',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/a/ae/Adler_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Gran Defensor',ap:400,price:null,src:'Tienda de coleccionables',pn:'Precio no confirmado',rar:'purple'},
+  {name:'Banjo del Errante',ap:200,price:2000,src:'Tienda de música',pn:'~2.000 ₣',rar:'blue'},
+  {name:'Ebisu Royal Tower',ap:100,price:0,src:'Misión Ebisu Auction (gratis)',pn:'Gratis',rar:'green'},
+ ]},
+// ── Chiz ── Cosmos · S
+{id:'chiz',name:'Chiz',rar:'S',el:'Cosmos',role:'DPS',col:'#c084fc',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/5/5b/Chiz_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Entrada Cine Floe',ap:400,price:3000,src:'Kiosko Floe Cinema',pn:'~3.000 ₣',rar:'blue'},
+  {name:'Caja del Conejo',ap:400,price:null,src:'Tienda de coleccionables',pn:'Precio no confirmado',rar:'purple'},
+ ]},
+// ── Baicang ── Incantation · S
+{id:'baicang',name:'Baicang',rar:'S',el:'Incantation',role:'DPS DoT',col:'#38bdf8',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/b/b8/Baicang_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Refulgent Agreement',ap:400,price:-1,src:'Warp Exchange (canjeable)',pn:'Canjeable (no Fons)',rar:'purple'},
+  {name:'Entrada Cine Floe',ap:400,price:3000,src:'Kiosko Floe Cinema',pn:'~3.000 ₣',rar:'blue'},
+  {name:'Kids Energy Meal',ap:100,price:1200,src:'Máquinas expendedoras',pn:'~1.200 ₣',rar:'green'},
+ ]},
+// ── Fadia ── Psyche · S
+{id:'fadia',name:'Fadia',rar:'S',el:'Psyche',role:'Survival',col:'#fb923c',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/8/8c/Fadia_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Glimmering Ice',ap:400,price:5000,src:'Hillside Blooms Florist',pn:'~5.000 ₣',rar:'purple'},
+  {name:'Manantial Dorado',ap:200,price:3000,src:'Tienda premium Ebisu',pn:'~3.000 ₣',rar:'blue'},
+  {name:'Ebisu Royal Tower',ap:100,price:0,src:'Misión Ebisu Auction (gratis)',pn:'Gratis',rar:'green'},
+ ]},
+// ── Skia ── Lakshana · A · gifts baratos, NO usar Fluffy Cotton
+{id:'skia',name:'Skia',rar:'A',el:'Lakshana',role:'DPS',col:'#94a3b8',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/e/e9/Skia_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'White Jade Lamp',ap:400,price:4000,src:'Brown Electronics, Miguel District',pn:'~4.000 ₣',rar:'blue'},
+  {name:'Canción del Gladiador',ap:200,price:2000,src:'Tienda de música',pn:'~2.000 ₣',rar:'blue'},
+  {name:'Ebisu Royal Tower',ap:100,price:0,src:'Misión Ebisu Auction (gratis)',pn:'Gratis',rar:'green'},
+ ]},
+// ── Daffodil ── Chaos · S
+{id:'daffodil',name:'Daffodil',rar:'S',el:'Chaos',role:'DPS',col:'#fbbf24',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/0/07/Daffodill_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Entrada Cine Floe',ap:400,price:3000,src:'Kiosko Floe Cinema',pn:'~3.000 ₣',rar:'blue'},
+  {name:'Promise Home',ap:400,price:null,src:'Tienda de decoración',pn:'Precio no confirmado',rar:'purple'},
+ ]},
+// ── Narciso ── Anima · A
+{id:'narciso',name:'Narciso',rar:'A',el:'Anima',role:'Soporte',col:'#86efac',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/thumb/4/47/Narciso_Icon.png/120px-Narciso_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Refrescante Cooly Cool',ap:200,price:1800,src:'Máquinas expendedoras',pn:'~1.800 ₣',rar:'green'},
+  {name:'Malvavisco Puka Sweet Dreams',ap:200,price:2500,src:'Puka Candy Shop',pn:'~2.500 ₣',rar:'green'},
+ ]},
+// ── Hotori ── Cosmos · S · LIMITED · element CONFIRMED Cosmos (NOT Lakshana)
+{id:'hotori',name:'Hotori',rar:'S',el:'Cosmos',role:'Buffer / Sub-DPS',col:'#f9a8d4',
+ img:'https://static.wikia.nocookie.net/neverness-to-everness/images/9/9b/Hotori_Icon.png',
+ gifts:[
+  {name:'Carta Escrita a Mano',ap:2000,price:-1,src:'Warp Exchange / Battle Pass',pn:'Sin costo Fons',rar:'gold'},
+  {name:'Algodón Esponjoso',ap:400,price:0,src:'Anomalía en tu casa (gratis)',pn:'Gratis',rar:'blue'},
+  {name:'Entrada Cine Floe',ap:400,price:3000,src:'Kiosko Floe Cinema',pn:'~3.000 ₣',rar:'blue'},
+  {name:'Ebisu Royal Tower',ap:100,price:0,src:'Misión Ebisu Auction (gratis)',pn:'Gratis',rar:'green'},
+ ]},
+];
+
+// ── SHOPS (precio confirmado donde existe) ──
+
+
+const SHOPS = [
+  {name:'Warp Exchange Circle Bounty',loc:'Sistema de teletransporte',col:'#8b7cf8',bg:'rgba(139,124,248,.13)',icon:'ti-arrows-transfer-up',
+   items:[
+    {name:'Carta Escrita a Mano',ap:2000,price:'Sin costo Fons',priceCls:'exch',chars:'Todos los personajes'},
+    {name:"Boss' Approval",ap:400,price:'Canjeable',priceCls:'exch',chars:'Edgar'},
+    {name:'Refulgent Agreement',ap:400,price:'Canjeable',priceCls:'exch',chars:'Baicang'},
+   ]},
+  {name:'Hillside Blooms Florist',loc:'Zona residencial',col:'#f472b6',bg:'rgba(244,114,182,.1)',icon:'ti-flower',
+   items:[
+    {name:'Blazing Crimson',ap:400,price:'~4.000 ₣',priceCls:'',chars:'Nanally'},
+    {name:'Glimmering Ice',ap:400,price:'~5.000 ₣',priceCls:'',chars:'Fadia'},
+   ]},
+  {name:'Kiosko Floe Cinema',loc:'Zona de entretenimiento',col:'#60a5fa',bg:'rgba(96,165,250,.1)',icon:'ti-movie',
+   items:[
+    {name:'Entrada Cine Floe',ap:400,price:'~3.000 ₣',priceCls:'',chars:'Mint · Daffodil · Chiz · Baicang · Hotori · Skia'},
+   ]},
+  {name:"Alice's Bakery",loc:'Zona gastronómica',col:'#f0b842',bg:'rgba(240,184,66,.1)',icon:'ti-bread',
+   items:[
+    {name:'Sakai Melon Bread',ap:400,price:'~2.000 ₣',priceCls:'',chars:'Jiuyuan ← El más barato entre 400AP'},
+   ]},
+  {name:'Oops! Chest Gift Shop',loc:'Centro comercial (múltiples ramas)',col:'#c084fc',bg:'rgba(192,132,252,.1)',icon:'ti-gift',
+   items:[
+    {name:'Blue Fable',ap:400,price:'~4.000 ₣',priceCls:'',chars:'Aurelia · Edgar · Sakiri'},
+    {name:'Fever Dream',ap:400,price:'5.000 ₣',priceCls:'',chars:'Hathor · Sakiri'},
+   ]},
+  {name:'Puka Candy Shop / Vending',loc:'Varias ubicaciones',col:'#fbbf24',bg:'rgba(251,191,36,.1)',icon:'ti-candy',
+   items:[
+    {name:'Puka Chocoa Ellie Tour Special',ap:400,price:'~3.500 ₣',priceCls:'',chars:'Haniel'},
+    {name:'Malvavisco Puka Sweet Dreams',ap:200,price:'~2.500 ₣',priceCls:'',chars:'Narciso'},
+   ]},
+  {name:'Brown Electronics',loc:'Bridge Crossings + Miguel District',col:'#94a3b8',bg:'rgba(148,163,184,.1)',icon:'ti-device-gamepad',
+   items:[
+    {name:'Bunny Box',ap:400,price:'20.000 ₣ ⚠',priceCls:'',chars:'Sakiri · ¡El más caro del juego! Usar Fluffy Cotton mejor'},
+    {name:'White Jade Lamp',ap:400,price:'~4.000 ₣',priceCls:'',chars:'Skia'},
+   ]},
+  {name:'Tienda de música (DSD POP / otras)',loc:'New Herland District + varias',col:'#2dd4bf',bg:'rgba(45,212,191,.1)',icon:'ti-music',
+   items:[
+    {name:'Waltz',ap:200,price:'~2.000 ₣',priceCls:'',chars:'Mint ← Muy eficiente por precio'},
+    {name:'Banjo del Errante',ap:200,price:'~2.000 ₣',priceCls:'',chars:'Adler'},
+    {name:'Canción del Gladiador',ap:200,price:'~2.000 ₣',priceCls:'',chars:'Skia'},
+    {name:'Sonata del Ruiseñor',ap:400,price:'Sin confirmar',priceCls:'na',chars:'Jiuyuan'},
+    {name:'Asahi Inori – Moonsilver',ap:400,price:'Gacha figuras',priceCls:'na',chars:'Mint · Haniel'},
+   ]},
+  {name:'Tienda de decoración',loc:'Varias tiendas de barrio',col:'#a78bfa',bg:'rgba(167,139,250,.1)',icon:'ti-sofa',
+   items:[
+    {name:'Luz Nocturna Ambiental',ap:200,price:'~2.500 ₣',priceCls:'',chars:'Aurelia'},
+    {name:'Promise Home',ap:400,price:'Sin confirmar',priceCls:'na',chars:'Daffodil'},
+   ]},
+  {name:'Tienda premium Ebisu',loc:'Distrito Ebisu (reputación alta)',col:'#fb923c',bg:'rgba(251,146,60,.1)',icon:'ti-crown',
+   items:[
+    {name:'Manantial Dorado',ap:200,price:'~3.000 ₣',priceCls:'',chars:'Fadia'},
+    {name:'Kokoro Rider L1',ap:400,price:'Sin confirmar',priceCls:'na',chars:'Nanally'},
+   ]},
+  {name:'Tienda de coleccionables',loc:'Zona comercial',col:'#f87171',bg:'rgba(248,113,113,.1)',icon:'ti-star',
+   items:[
+    {name:'Gran Defensor',ap:400,price:'Sin confirmar',priceCls:'na',chars:'Adler'},
+    {name:'Caja del Conejo',ap:400,price:'Sin confirmar',priceCls:'na',chars:'Chiz'},
+   ]},
+  {name:'Máquinas expendedoras',loc:'Toda la ciudad de Hethereau',col:'#34d399',bg:'rgba(52,211,153,.1)',icon:'ti-device-floppy',
+   items:[
+    {name:'Refrescante Cooly Cool',ap:200,price:'~1.800 ₣',priceCls:'',chars:'Hathor · Narciso ← Muy económico'},
+    {name:'Kids Energy Meal',ap:100,price:'~1.200 ₣',priceCls:'',chars:'Sakiri · Baicang · Mint'},
+   ]},
+  {name:'Anomalía en tu casa',loc:'Wiener / Eden / Fenglin Villa',col:'#4ade80',bg:'rgba(74,222,128,.1)',icon:'ti-home-2',
+   items:[
+    {name:'Algodón Esponjoso (Fluffy Cotton)',ap:400,price:'Gratis',priceCls:'free',chars:'Casi todos · ~20–25 unid/mes · NO usar en Skia (tiene baratos)'},
+   ]},
+  {name:'Misión principal — Ebisu Auction',loc:'Historia principal (evento único)',col:'#f0b842',bg:'rgba(240,184,66,.1)',icon:'ti-bolt',
+   items:[
+    {name:'Ebisu Royal Tower',ap:100,price:'Gratis (~40 unidades)',priceCls:'free',chars:'Nanally · Aurelia · Adler · Hathor · Fadia · Jiuyuan · Hotori'},
+   ]},
+];
+
+
+const UNLOCKS=[
+  {lv:2,txt:'Shotgun Riding + Sidekick Showdown'},
+  {lv:4,txt:'Home Invitations + City Hangouts'},
+  {lv:6,txt:'Special Interactions + citas extra'},
+  {lv:8,txt:'Heartbond — cita única especial'},
+  {lv:10,txt:'Bond completo · 80 Annulith totales'},
+];
+
+const TOTAL_AP=56000,THRESH=[0,5600,11200,16800,22400,28000,33600,39200,44800,50400,56000];
+const S={sel:null,ap:{},day:{},filter:'all',search:'',calLog:{}};
+CHARS.forEach(c=>{S.ap[c.id]=0;S.day[c.id]=0;});
+try{const sv=JSON.parse(localStorage.getItem('nte_v4')||'{}');if(sv.ap)Object.assign(S.ap,sv.ap);if(sv.calLog)Object.assign(S.calLog,sv.calLog);}catch(e){}
+function save(){try{localStorage.setItem('nte_v4',JSON.stringify({ap:S.ap,calLog:S.calLog}));}catch(e){}}
+
+// HELPERS
+function ini(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
+function lv(ap){const a=Math.min(TOTAL_AP,ap);for(let i=0;i<10;i++){if(a<THRESH[i+1])return{level:i+1,inL:a-THRESH[i],need:5600,pct:Math.round((a-THRESH[i])/5600*100)};}return{level:10,inL:5600,need:5600,pct:100};}
+function ab(ap){return ap>=2000?'g2000':ap>=400?'g400':ap>=200?'g200':'g100';}
+function elc(el){return{Cosmos:'eco',Anima:'ean',Incantation:'ein',Chaos:'ech',Psyche:'eps',Lakshana:'ela'}[el]||'';}
+function elCol(el){return{Cosmos:'var(--cosmos)',Anima:'var(--anima)',Incantation:'var(--incant)',Chaos:'var(--chaos)',Psyche:'var(--psyche)',Lakshana:'var(--lakshana)'}[el]||'var(--ac)';}
+function dt(){return Object.values(S.day).reduce((a,b)=>a+b,0);}
+function fmt(n){return n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?(n/1000).toFixed(0)+'K':n.toString();}
+function todayKey(){return new Date().toISOString().slice(0,10);}
+function avImg(c,size,extra=''){
+  const p=CHAR_PORTRAITS[c.id];
+  if(p)return`<img src="${p}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;${extra}" alt="${c.name}">`;
+  return`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${c.col};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*.3)}px;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--fd)">${ini(c.name)}</div>`;
+}
+
+// FILTER + SEARCH
+function sf(f,btn){
+  S.filter=f;
+  document.querySelectorAll('#fbar .chip').forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');
+  buildGrid();
+}
+function onSearch(val){S.search=val.toLowerCase();buildGrid();}
+function charOk(c){
+  if(S.search&&!c.name.toLowerCase().includes(S.search)&&!c.el.toLowerCase().includes(S.search))return false;
+  if(S.filter==='all')return true;
+  if(S.filter==='rar-S')return c.rar==='S';
+  if(S.filter==='rar-A')return c.rar==='A';
+  if(S.filter==='active')return S.ap[c.id]>0;
+  if(S.filter==='todo')return S.ap[c.id]<TOTAL_AP;
+  if(S.filter==='ready')return S.day[c.id]<3&&dt()<10&&S.ap[c.id]<TOTAL_AP;
+  return c.el===S.filter;
+}
+
+// GRID
+function buildGrid(){
+  const vis=CHARS.filter(charOk);
+  document.getElementById('rc').textContent=vis.length+' PJ';
+  document.getElementById('cgrid').innerHTML=vis.map(c=>{
+    const li=lv(S.ap[c.id]),maxed=li.level>=10,gifted=S.day[c.id]>0;
+    return`<div class="cc${S.sel===c.id?' sel':''}${maxed?' maxed':''}" onclick="selChar('${c.id}')">
+      <div class="cc-av">
+        ${avImg(c,48)}
+        <div class="crar r${c.rar.toLowerCase()}">${c.rar}</div>
+        ${gifted&&!maxed?`<div style="position:absolute;top:-2px;left:-2px;width:10px;height:10px;border-radius:50%;background:var(--green);border:1.5px solid var(--bg2)"></div>`:''}
+      </div>
+      <div class="cname">${c.name}</div>
+      <div class="cel ${elc(c.el)}">${c.el}</div>
+      <div class="cbar"><div class="cbarf" style="width:${maxed?100:li.pct}%;background:${c.col}"></div></div>
+    </div>`;
+  }).join('')||'<div style="color:var(--t3);font-size:12px;padding:20px;text-align:center;grid-column:1/-1">Ningún personaje encontrado</div>';
+  updHdr();
+}
+function updHdr(){
+  const u=dt();
+  document.getElementById('hd').textContent=10-u;
+  document.getElementById('hp').textContent=CHARS.filter(c=>S.ap[c.id]>0).length;
+  document.getElementById('hm').textContent=CHARS.filter(c=>S.ap[c.id]>=TOTAL_AP).length;
+  document.getElementById('ds-left').textContent=10-u;
+  document.getElementById('ds-used').textContent=u;
+  document.getElementById('ds-chars').textContent=CHARS.filter(c=>S.day[c.id]>0).length;
+  const pct=Math.round(u/10*100);
+  document.getElementById('ds-pct').textContent=pct+'%';
+  document.getElementById('ds-fill').style.width=pct+'%';
+  // color the left number
+  const lel=document.getElementById('ds-left');
+  lel.style.color=u>=10?'var(--red)':u>=7?'var(--gold)':'var(--ac)';
+}
+
+// DETAIL
+function selChar(id){S.sel=id;buildGrid();renderDetail();}
+function renderDetail(){
+  const box=document.getElementById('detail');
+  const c=CHARS.find(x=>x.id===S.sel);
+  if(!c){box.innerHTML='<div class="dp-empty"><i class="ti ti-heart-handshake"></i><p>Seleccioná un personaje<br>para ver su vínculo, regalos<br>y estrategia óptima</p></div>';return;}
+  const li=lv(S.ap[c.id]),dT=dt(),cD=S.day[c.id],can=dT<10&&cD<3&&S.ap[c.id]<TOTAL_AP;
+  const remAP=Math.max(0,TOTAL_AP-S.ap[c.id]);
+  // Optimal route
+  const buy=c.gifts.filter(g=>g.ap>=200&&g.price!==null&&g.price>=0);
+  const cheap=buy.sort((a,b)=>(a.price/a.ap)-(b.price/b.ap))[0];
+  const giftsNeeded=cheap?Math.ceil(remAP/cheap.ap):0;
+  const fonsNeeded=cheap&&cheap.price>0?giftsNeeded*cheap.price:0;
+  const daysNeeded=Math.ceil(giftsNeeded/3);
+  const optHtml=cheap?`<div class="bopt"><strong>Ruta óptima:</strong> ${giftsNeeded}× <em>${cheap.name}</em>
+    (+${cheap.ap} AP · ${cheap.price===0?'<span style="color:var(--green)">Gratis</span>':cheap.price.toLocaleString()+' <span style="color:var(--fons)">₣</span>'}/u)
+    = <span class="hl">${fonsNeeded>0?fonsNeeded.toLocaleString()+' ₣ totales':'Sin costo en Fons'}</span> · ~${daysNeeded} días mín.</div>`:'';
+  const unlR=UNLOCKS.map(u=>{const done=li.level>=u.lv;return`<div class="unl${done?' done':''}"><span class="ulv">Niv.${u.lv}</span><span class="utxt">${u.txt}</span><i class="ti ${done?'ti-circle-check ud':'ti-lock ul2'} uico"></i></div>`;}).join('');
+  const giftR=c.gifts.map(g=>{
+    const pc=g.price===0?'free':g.price===-1?'exch':g.price===null?'na':'';
+    const ps=g.price===0?'GRATIS':g.price===-1?'Canjeable':g.price===null?'—':g.price.toLocaleString()+' ₣';
+    return`<div class="gift">
+      <span class="gtier ${ab(g.ap)}">+${g.ap}</span>
+      <div class="gi"><div class="gname">${g.name}</div><div class="gsrc"><i class="ti ti-map-pin" style="font-size:8px"></i> ${g.src}</div></div>
+      <span class="gprice ${pc}">${ps}</span>
+      <button class="gbtn" onclick="giveGift('${c.id}',${g.ap})" ${can?'':'disabled'}>Dar</button>
+    </div>`;
+  }).join('');
+  const msg=can?`Podés dar ${3-cD} regalo(s) más hoy a ${c.name}`:cD>=3?`${c.name} ya recibió 3 regalos hoy`:`Límite diario total alcanzado (10/10)`;
+  const lim=c.id==='hotori'?'<span class="dtag dtlim">Limitada</span>':'';
+  box.innerHTML=`
+    <div class="dp-hero" style="--hc:${c.col}">
+      <div style="position:relative;flex-shrink:0">
+        ${avImg(c,64,'border:2px solid rgba(255,255,255,0.1)')}
+        <div class="hrar r${c.rar.toLowerCase()}">${c.rar}</div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div class="hname">${c.name}</div>
+        <div class="hrole ${elc(c.el)}">${c.el} · ${c.role}</div>
+        <div class="htags">
+          <span class="dtag ${c.rar==='S'?'dts':'dta'}">${c.rar}-Class</span>
+          <span class="dtag dtel">${c.el}</span>
+          <span class="dtag dtel">${c.role}</span>${lim}
+        </div>
+      </div>
+    </div>
+    <div class="dp-body">
+      <div class="dp-sec">
+        <div class="dp-sec-t"><i class="ti ti-edit" style="font-size:12px"></i>AP actuales</div>
+        <div class="aprow">
+          <span class="aplbl">Total:</span>
+          <input class="apinp" id="ap-inp" type="number" min="0" max="56000" value="${S.ap[c.id]}" placeholder="0–56000">
+          <button class="apbtn" onclick="setAP('${c.id}')">Guardar</button>
+        </div>
+        <div class="aphint">Niv.1=0 · Niv.5=28.000 · Niv.10=56.000 AP totales acumulados</div>
+      </div>
+      <div class="dp-sec">
+        <div class="dp-sec-t"><i class="ti ti-heart" style="font-size:12px"></i>Vínculo</div>
+        <div class="bnums"><span class="blv">Nivel ${li.level}/10</span><span class="bpct">${li.pct}% del nivel · ${S.ap[c.id].toLocaleString()} AP total</span></div>
+        <div class="btrack"><div class="bfill" id="bfill-anim" style="width:0%;background:linear-gradient(90deg,${c.col},${c.col}99)"></div></div>
+        <div class="bmeta">${li.inL.toLocaleString()} / ${li.need.toLocaleString()} AP en niv.${li.level} · Faltan ${remAP.toLocaleString()} AP para MAX</div>
+        ${optHtml}
+        <div class="unlocks" style="margin-top:10px">${unlR}</div>
+      </div>
+      <div class="dp-sec">
+        <div class="dp-sec-t"><i class="ti ti-gift" style="font-size:12px"></i>Regalos favoritos <span>${cD}/3 hoy · ${dT}/10 total diario</span></div>
+        ${giftR}
+        <div class="gmsg">${msg}</div>
+      </div>
+    </div>`;
+  // Animate bar
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const bf=document.getElementById('bfill-anim');
+    if(bf)bf.style.width=li.pct+'%';
+  }));
+}
+function setAP(id){
+  const v=Math.max(0,Math.min(TOTAL_AP,parseInt(document.getElementById('ap-inp').value)||0));
+  S.ap[id]=v;save();buildGrid();renderDetail();updSum();updStats();
+  toast(`AP de ${CHARS.find(c=>c.id===id).name} guardado ✓`);
+}
+function giveGift(id,ap){
+  if(dt()>=10||S.day[id]>=3||S.ap[id]>=TOTAL_AP)return;
+  const prev=lv(S.ap[id]).level;
+  S.ap[id]=Math.min(TOTAL_AP,S.ap[id]+ap);S.day[id]++;
+  const now=lv(S.ap[id]).level;
+  const k=todayKey();if(!S.calLog[k])S.calLog[k]={};
+  S.calLog[k][id]=(S.calLog[k][id]||0)+1;
+  save();buildGrid();renderDetail();updSum();updStats();buildPlan();
+  const cname=CHARS.find(c=>c.id===id).name;
+  if(now>prev)toast(`🎉 ¡${cname} subió al nivel ${now}!`);
+  else toast(`+${ap} AP para ${cname}`);
+}
+function resetDay(){if(!confirm('¿Reiniciar los límites diarios de regalos?'))return;CHARS.forEach(c=>S.day[c.id]=0);buildGrid();renderDetail();updHdr();buildPlan();toast('Límites diarios reiniciados');}
+
+// CALC
+function buildCalc(){
+  const sel=document.getElementById('cc');
+  if(sel.options.length)return;
+  CHARS.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});
+  // Sync with current char if selected
+  if(S.sel){sel.value=S.sel;syncCalcFromChar();}
+  rc2();updSum();
+}
+function syncCalcFromChar(){
+  const c=CHARS.find(x=>x.id===document.getElementById('cc').value);
+  if(!c)return;
+  document.getElementById('cap').value=S.ap[c.id];
+  // Find best gift price
+  const bg=c.gifts.filter(g=>g.ap>=200&&g.price>=0).sort((a,b)=>a.price-b.price)[0];
+  if(bg){document.getElementById('cp').value=bg.price;document.getElementById('cg').value=bg.ap;}
+  rc2();
+}
+function rc2(){
+  const curAP=Math.max(0,Math.min(TOTAL_AP,parseInt(document.getElementById('cap').value)||0));
+  const gAP=parseInt(document.getElementById('cg').value)||400;
+  const gP=parseInt(document.getElementById('cp').value)||0;
+  const rem=Math.max(0,TOTAL_AP-curAP);
+  const gifts=Math.ceil(rem/gAP),days=Math.ceil(gifts/3),fons=gifts*gP;
+  document.getElementById('r-ap').textContent=rem.toLocaleString();
+  document.getElementById('r-days').textContent=days;
+  document.getElementById('r-fons').textContent=gP>0?fmt(fons)+' ₣':'Gratis';
+  // Level indicator
+  const curLv=lv(curAP);
+  document.getElementById('calc-lv-ind').textContent=`Niv.${curLv.level} · ${curLv.pct}%`;
+  const maxD=Math.max(1,Math.ceil(rem/100/3));
+  document.getElementById('tl').innerHTML=[
+    {n:'Carta a Mano (2000AP)',ap:2000,p:0,col:'#f0b842'},
+    {n:'Floe/Blazing (400AP)',ap:400,p:3500,col:'#7c6ff7'},
+    {n:'Waltz/Cooly (200AP)',ap:200,p:2000,col:'#5ba8ff'},
+    {n:'Ebisu Tower (100AP)',ap:100,p:0,col:'#36d674'},
+  ].map(t=>{
+    const d=Math.ceil(rem/t.ap/3),f=Math.ceil(rem/t.ap)*t.p,w=Math.round(d/maxD*100);
+    return`<div class="tl-r"><div class="tl-n">${t.n}</div><div class="tl-tr"><div class="tl-f" style="width:${w}%;background:${t.col}"></div></div><div class="tl-v">${d}d · ${t.p>0?fmt(f)+'₣':'Gratis'}</div></div>`;
+  }).join('');
+}
+function updSum(){
+  const sorted=[...CHARS].sort((a,b)=>S.ap[b.id]-S.ap[a.id]);
+  document.getElementById('all-sum').innerHTML=sorted.map(c=>{
+    const li=lv(S.ap[c.id]);
+    const rem=Math.max(0,TOTAL_AP-S.ap[c.id]);
+    const days=rem>0?Math.ceil(rem/400/3)+'d':'MAX';
+    const pct=Math.round(S.ap[c.id]/TOTAL_AP*100);
+    return`<div class="acs" onclick="selChar('${c.id}');swId('chars')" style="cursor:pointer">
+      ${avImg(c,28)}
+      <div class="acm">
+        <div class="acn">${c.name} <span class="${elc(c.el)}" style="font-size:8px;font-weight:600">&middot; ${c.el}</span></div>
+        <div class="acbar"><div class="acbf" style="width:${pct}%;background:${c.col}"></div></div>
+      </div>
+      <div class="acr"><div class="aclv">Niv.${li.level}</div><div class="acd">${days}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// AI
+async function askAI(){
+  const cid=document.getElementById('cc').value;
+  const cap=parseInt(document.getElementById('cap').value)||0;
+  const gAP=parseInt(document.getElementById('cg').value)||400;
+  const gP=parseInt(document.getElementById('cp').value)||0;
+  const c=CHARS.find(x=>x.id===cid);if(!c)return;
+  const li=lv(cap),rem=Math.max(0,TOTAL_AP-cap),gifts=Math.ceil(rem/gAP);
+  const glist=c.gifts.map(g=>`${g.name}(+${g.ap}AP,${g.price===0?'Gratis':g.price===-1?'Canjeable':g.price===null?'nc':g.price+'₣'})`).join(', ');
+  const totalFons=CHARS.reduce((acc,ch)=>{const r=Math.max(0,TOTAL_AP-S.ap[ch.id]);return acc+Math.ceil(r/400)*3500;},0);
+  const prompt=`Sos un experto en NTE (Neverness to Everness). El jugador tiene a ${c.name} (${c.el}·${c.rar}·${c.role}) en nivel ${li.level}/10 con ${cap.toLocaleString()} AP. Faltan ${rem.toLocaleString()} AP. Usando regalos de ${gAP}AP a ${gP===0?'costo cero':gP.toLocaleString()+'₣'}: necesita ${gifts} regalos en ~${Math.ceil(gifts/3)} días. Regalos favoritos: ${glist}. También hay: Algodón Esponjoso(400AP,Gratis,~20-25/mes) y Ebisu Tower(100AP,Gratis). El jugador tiene ${CHARS.filter(ch=>S.ap[ch.id]>0).length} PJ activos en total. Consejos concretos en español rioplatense (4-5 líneas, sin markdown): regalo más eficiente, si conviene gastar Fons o no, combinación ideal con gratuitos, y estimación de tiempo total. Sé directo y práctico.`;
+  const o=document.getElementById('ai-o');
+  o.innerHTML='<div class="ai-ld"><div class="dot"></div><div class="dot"></div><div class="dot"></div>&nbsp;Analizando tu progreso…</div>';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const d=await res.json();
+    const txt=d.content?.map(b=>b.text||'').join('')||'Sin respuesta.';
+    o.textContent=txt;
+  }catch(e){o.textContent='Error de conexión. Revisá tu red e intentá de nuevo.';}
+}
+
+// PLAN
+function buildPlan(){buildCal();buildPrio();buildDailyPlan();buildMs();}
+function buildCal(){
+  const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const today=new Date();
+  document.getElementById('calgrid').innerHTML=Array.from({length:7},(_,i)=>{
+    const d=new Date(today);d.setDate(today.getDate()+i);
+    const key=d.toISOString().slice(0,10);
+    const log=S.calLog[key]||{};
+    const ids=Object.keys(log);
+    const dots=ids.slice(0,5).map(id=>{const c=CHARS.find(x=>x.id===id);return c?`<div class="cdot" style="background:${c.col}" title="${c.name}"></div>`:''}).join('');
+    const total=Object.values(log).reduce((a,b)=>a+b,0);
+    return`<div class="cday${i===0?' today':i<0?' past':''}">
+      <div class="cday-lbl">${DAYS[d.getDay()]}</div>
+      <div class="cday-n">${d.getDate()}</div>
+      <div class="cday-dots">${dots||'<div class="cdot" style="background:var(--bg6)"></div>'}</div>
+      ${total>0?`<div style="font-size:8px;color:var(--t3);margin-top:2px">${total}🎁</div>`:''}
+    </div>`;
+  }).join('');
+}
+function buildPrio(){
+  const scored=CHARS.map(c=>{
+    const li=lv(S.ap[c.id]);
+    if(li.level>=10)return null;
+    const closeness=li.inL/li.need;
+    const rarBonus=c.rar==='S'?1.3:1;
+    const score=Math.round(closeness*100*rarBonus);
+    const cg=c.gifts.filter(g=>g.ap>=200&&g.price>=0).sort((a,b)=>a.price-b.price)[0];
+    const toNext=li.need-li.inL;
+    return{c,li,score,toNext,cg,closeness};
+  }).filter(Boolean).sort((a,b)=>b.score-a.score).slice(0,5);
+  document.getElementById('prio-list').innerHTML=scored.length?
+    scored.map(({c,li,score,toNext,cg,closeness},i)=>`
+      <div class="pr-row">
+        <div class="pr-rank${i===0?' top':''}">${i+1}</div>
+        ${avImg(c,36)}
+        <div class="pr-info">
+          <div class="pr-name">${c.name} <span class="${elc(c.el)}" style="font-size:9px">&middot; Niv.${li.level}</span></div>
+          <div class="pr-why">${toNext.toLocaleString()} AP · ${cg?cg.name:'Algodón Esponjoso'} ${cg&&cg.price>0?'('+cg.price.toLocaleString()+'₣)':'(Gratis)'}</div>
+          <div class="pr-bar"><div class="pr-barf" style="width:${Math.round(closeness*100)}%;background:${c.col}"></div></div>
+        </div>
+        <div class="pr-score">${score}pt</div>
+      </div>`).join('')
+    :'<div style="color:var(--t3);font-size:12px;padding:14px;text-align:center">🎉 ¡Todos los PJ al máximo!</div>';
+}
+function buildDailyPlan(){
+  const used=dt(),rem=10-used;
+  if(rem===0){document.getElementById('daily-plan').innerHTML='<div style="color:var(--green);font-size:12px;padding:10px;text-align:center;display:flex;align-items:center;gap:6px;justify-content:center"><i class="ti ti-circle-check"></i>Completaste todos los regalos de hoy</div>';return;}
+  const sugs=CHARS.filter(c=>S.ap[c.id]<TOTAL_AP&&S.day[c.id]<3).map(c=>{
+    const li=lv(S.ap[c.id]);
+    const cg=c.gifts.filter(g=>g.ap>=200&&(g.price===0||g.price>0)).sort((a,b)=>(a.price||99999)-(b.price||99999))[0];
+    return{c,pct:li.inL/li.need,cg,li};
+  }).sort((a,b)=>b.pct-a.pct).slice(0,4);
+  document.getElementById('daily-plan').innerHTML=
+    `<div style="font-size:11px;color:var(--t2);margin-bottom:10px;display:flex;align-items:center;gap:5px"><i class="ti ti-sparkles" style="color:var(--ac)"></i>Tenés <strong style="color:var(--ac)">${rem}</strong> regalos disponibles hoy:</div>`+
+    sugs.map(s=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b)">
+      ${avImg(s.c,32)}
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t)">${s.c.name} <span style="font-size:9px;color:var(--t3)">&middot; ${3-S.day[s.c.id]} disp. hoy</span></div>
+        <div style="font-size:10px;color:var(--t2);margin-top:1px">${s.cg?s.cg.name+' · +'+s.cg.ap+' AP'+(s.cg.price===0?' · <span style="color:var(--green)">Gratis</span>':s.cg.price>0?' · '+s.cg.price.toLocaleString()+'₣':''):'Algodón Esponjoso · +400 AP · Gratis'}</div>
+      </div>
+      <button class="vbtn" onclick="selChar('${s.c.id}');swId('chars')">Ver</button>
+    </div>`).join('');
+}
+function buildMs(){
+  const maxed=CHARS.filter(c=>S.ap[c.id]>=TOTAL_AP).length;
+  const active=CHARS.filter(c=>S.ap[c.id]>0).length;
+  const atLv5=CHARS.filter(c=>lv(S.ap[c.id]).level>=5).length;
+  const ms=[
+    {name:'Primer regalo',desc:'Dá tu primer regalo a cualquier PJ',done:active>=1,icon:'🎁',prog:null},
+    {name:'Primer Niv.5',desc:'Llegá al vínculo 5',done:atLv5>=1,icon:'⭐',prog:{cur:atLv5,max:1}},
+    {name:'5 PJ activos',desc:'Progresá con 5 personajes',done:active>=5,icon:'🌟',prog:{cur:Math.min(active,5),max:5}},
+    {name:'Primer MAX',desc:'Llevá un PJ al vínculo 10',done:maxed>=1,icon:'👑',prog:{cur:Math.min(maxed,1),max:1}},
+    {name:'3 PJ en Niv.5+',desc:'3 personajes en vínculo 5 o más',done:atLv5>=3,icon:'💫',prog:{cur:Math.min(atLv5,3),max:3}},
+    {name:'3 PJ al MAX',desc:'3 personajes al vínculo 10',done:maxed>=3,icon:'💎',prog:{cur:Math.min(maxed,3),max:3}},
+    {name:'Todos los PJ activos',desc:'16 PJ con algún progreso',done:active>=16,icon:'🏆',prog:{cur:active,max:16}},
+    {name:'Todos al MAX',desc:'Los 16 personajes al vínculo 10',done:maxed>=16,icon:'🌌',prog:{cur:maxed,max:16}},
+  ];
+  document.getElementById('ms-list').innerHTML=ms.map(m=>`
+    <div class="ms${m.done?' done':''}">
+      <div class="ms-ico">${m.icon}</div>
+      <div class="ms-i">
+        <div class="ms-n">${m.name}</div>
+        <div class="ms-d">${m.desc}</div>
+        ${m.prog&&!m.done?`<div class="ms-prog"><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t3);margin-bottom:2px"><span>Progreso</span><span>${m.prog.cur}/${m.prog.max}</span></div><div class="ms-pbar"><div class="ms-pfill" style="width:${Math.round(m.prog.cur/m.prog.max*100)}%"></div></div></div>`:''}
+      </div>
+      <div class="ms-s">${m.done?'✅':'—'}</div>
+    </div>`).join('');
+}
+
+// STATS
+function updStats(){
+  const tAP=Object.values(S.ap).reduce((a,b)=>a+b,0);
+  const maxed=CHARS.filter(c=>S.ap[c.id]>=TOTAL_AP).length;
+  const pct=Math.round(tAP/(TOTAL_AP*16)*100);
+  document.getElementById('st-ap').textContent=tAP.toLocaleString();
+  document.getElementById('st-pct').textContent=pct+'%';
+  document.getElementById('st-pct-s').textContent=`${maxed} / 16 PJ al máximo`;
+  document.getElementById('st-fons').textContent=fmt(Math.round(tAP/400)*3000)+'₣';
+  const best=CHARS.reduce((a,b)=>S.ap[a.id]>=S.ap[b.id]?a:b);
+  const bLi=lv(S.ap[best.id]);
+  document.getElementById('st-best-av').innerHTML=avImg(best,44);
+  document.getElementById('st-best-n').textContent=best.name;
+  document.getElementById('st-best-l').textContent=`Niv.${bLi.level} · ${S.ap[best.id].toLocaleString()} AP`;
+  // El breakdown
+  const els=['Cosmos','Anima','Incantation','Chaos','Psyche','Lakshana'];
+  const elAP={};els.forEach(e=>elAP[e]=0);
+  CHARS.forEach(c=>elAP[c.el]=(elAP[c.el]||0)+S.ap[c.id]);
+  const mx=Math.max(...Object.values(elAP))||1;
+  document.getElementById('el-bk').innerHTML=els.map(e=>`
+    <div class="el-row2">
+      <div class="el-dot2" style="background:${elCol(e)}"></div>
+      <div class="el-nm2" style="color:${elCol(e)}">${e}</div>
+      <div class="el-tr2"><div class="el-f2" style="width:${Math.round(elAP[e]/mx*100)}%;background:${elCol(e)}"></div></div>
+      <div class="el-ct2">${(elAP[e]/1000).toFixed(1)}K</div>
+    </div>`).join('');
+  // Activity heatmap last 30 days
+  const cells=[];
+  for(let i=29;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const key=d.toISOString().slice(0,10);const log=S.calLog[key]||{};const total=Object.values(log).reduce((a,b)=>a+b,0);const intensity=total===0?0:total<=2?1:total<=5?2:total<=8?3:4;const colors=['var(--bg5)','rgba(124,111,247,.3)','rgba(124,111,247,.55)','rgba(124,111,247,.8)','var(--ac)'];cells.push(`<div class="hm-cell" style="background:${colors[intensity]}" title="${key}: ${total} regalos"></div>`);}
+  document.getElementById('hm').innerHTML=cells.join('');
+  // Global milestones
+  const gms=[
+    {name:'50K AP totales',done:tAP>=50000,icon:'⚡'},
+    {name:'250K AP totales',done:tAP>=250000,icon:'🔥'},
+    {name:'500K AP totales',done:tAP>=500000,icon:'💫'},
+    {name:'Primer MAX',done:maxed>=1,icon:'👑'},
+    {name:'5 PJ al MAX',done:maxed>=5,icon:'💎'},
+    {name:'Todos al MAX',done:maxed>=16,icon:'🌌'},
+  ];
+  document.getElementById('gms').innerHTML=gms.map(m=>`<div class="ms${m.done?' done':''}"><div class="ms-ico">${m.icon}</div><div class="ms-i"><div class="ms-n">${m.name}</div></div><div class="ms-s">${m.done?'✅':'—'}</div></div>`).join('');
+  // color stat big
+  document.getElementById('st-pct').style.color=pct>=80?'var(--green)':pct>=50?'var(--teal)':'var(--ac)';
+}
+
+// SHOP
+function buildShops(){
+  document.getElementById('sgrid').innerHTML=SHOPS.map(s=>`
+    <div class="scard">
+      <div class="sc-h">
+        <div class="sc-ico" style="background:${s.bg};color:${s.col}"><i class="ti ${s.icon}"></i></div>
+        <div><div class="sc-n">${s.name}</div><div class="sc-l"><i class="ti ti-map-pin" style="font-size:8px"></i> ${s.loc}</div></div>
+      </div>
+      ${s.items.map(i=>`<div class="sg">
+        <div class="sg-i"><div class="sg-n">${i.name}</div><div class="sg-c">${i.chars}</div><div class="sg-ap">+${i.ap} AP</div></div>
+        <div class="sg-p ${i.priceCls}">${i.price}</div>
+      </div>`).join('')}
+    </div>`).join('');
+}
+
+// TABS
+function sw(t,btn){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+t).classList.add('on');
+  if(btn)btn.classList.add('on');
+  if(t==='calc'){buildCalc();updSum();}
+  if(t==='plan')buildPlan();
+  if(t==='stats')updStats();
+}
+function swId(t){const btn=document.querySelector(`.tab[onclick*="'${t}'"]`);sw(t,btn);}
+
+// TOAST
+function toast(msg){
+  const el=document.getElementById('toast');
+  document.getElementById('tmsg').textContent=msg;
+  el.classList.add('show');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+// KEYBOARD
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.key==='Escape'){S.sel=null;buildGrid();renderDetail();}
+});
+
+// INIT
+buildGrid();buildShops();updStats();
+
+
+// BAIT DATA
+const BAITS = [
+  {name:'Universal Bait',fish:'Cualquier pez común',ap:'Starter',col:'#6b7280',note:'Gratis del tutorial'},
+  {name:'Shrimp',fish:'Pufferfish, Salmon, Bluefin Tuna',ap:'Rare',col:'#f87171',note:'Muy eficiente para épicos'},
+  {name:'Spicy',fish:'Mahi-Mahi, Yellowfin Tuna, Red Lionfish',ap:'Epic',col:'#f0b842',note:'Peces de alto valor'},
+  {name:'Worm',fish:'Sunfish, Flounder, Blazing Mahi-Mahi',ap:'Epic',col:'#4ade80',note:'Blazing Mahi-Mahi = top EXP'},
+  {name:'Grain Mix',fish:'Blackstripe Piranha, Payara, Redcap Oranda',ap:'Epic',col:'#fbbf24',note:''},
+  {name:'Fruit Bait',fish:'Greenspot Piranha, Tench, Black Knife',ap:'Epic',col:'#86efac',note:''},
+  {name:'Burgundy',fish:'Neon Tetra, Veil Carp, Red Betta',ap:'Rare',col:'#f472b6',note:''},
+  {name:'Sweet Wheat',fish:'Goldfish, Silver Arowana, Rainbow Guppy',ap:'Rare',col:'#fcd34d',note:'Arowana = buen precio'},
+  {name:'Clam',fish:'Bluestripe/Greenstripe Angelfish, Red Star Dragon',ap:'Epic',col:'#5ba8ff',note:''},
+  {name:'Fragrant',fish:'Emperor Angelfish, Blue Tang, Ghostfish',ap:'Epic',col:'#a78bfa',note:'Blue Tang = alto valor'},
+  {name:'Eight-Treasure',fish:'Giant Snakehead, Koi',ap:'Legendary',col:'#f0b842',note:''},
+  {name:'Secret Mix',fish:'Golden Cobra Snakehead, Star Sapphire Cichlid',ap:'Legendary',col:'#ff8c42',note:'Top tier legendarios'},
+  {name:'Algae/Bone',fish:'Yellow/Red Zebrasoma, Pink Saddleback Angelfish',ap:'Rare',col:'#4ade80',note:'Pez cirujano amarillo!'},
+];
+
+function buildBaitList() {
+  const rarCol = {Starter:'var(--t3)',Rare:'var(--blue)',Epic:'var(--ac)',Legendary:'var(--gold)'};
+  const rarBg = {Starter:'var(--bg5)',Rare:'rgba(91,168,255,0.1)',Epic:'rgba(124,111,247,0.12)',Legendary:'rgba(240,184,66,0.12)'};
+  document.getElementById('bait-list').innerHTML = BAITS.map(b=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r1);transition:border-color .15s" onmouseenter="this.style.borderColor='var(--b2)'" onmouseleave="this.style.borderColor='var(--b)'">
+      <div style="width:8px;height:8px;border-radius:50%;background:${b.col};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:700;color:var(--t);display:flex;align-items:center;gap:6px">
+          ${b.name}
+          <span style="font-size:8px;font-weight:700;padding:1px 6px;border-radius:99px;background:${rarBg[b.ap]};color:${rarCol[b.ap]};font-family:var(--fd)">${b.ap}</span>
+          ${b.note?`<span style="font-size:9px;color:var(--teal)">★ ${b.note}</span>`:''}
+        </div>
+        <div style="font-size:9px;color:var(--t3);margin-top:1px">${b.fish}</div>
+      </div>
+    </div>`).join('');
+}
+
+function updFishTracker() {
+  const lv = parseInt(document.getElementById('fish-lv').value)||1;
+  const rod = parseInt(document.getElementById('fish-rod').value)||1;
+  const method = document.getElementById('fish-method').value;
+  const lvRemain = Math.max(0,10-lv);
+  const annuliths = lvRemain*50;
+  const cores = lvRemain*3;
+  
+  const days = {
+    casual: lvRemain*7,
+    market: Math.round(lvRemain*4.5),
+    epic: Math.round(lvRemain*3.5),
+    optimal: Math.round(lvRemain*2.5)
+  }[method]||0;
+  
+  const rodTip = rod===1?'⚠️ <strong style="color:var(--gold)">Comprá la Rod II lo antes posible</strong> — es el upgrade más importante.':
+                 rod===2?'✅ Buena elección. Cuando tengas Scale Coins apuntá a la Rod III para legendarios.':
+                 rod===3?'✅ Muy bien equipado. La Rod IV te hará los legendarios mucho más cómodos.':
+                 '🏆 Equipo de pesca máximo. Solo queda pescar!';
+  
+  const skinStatus = lv>=10?'<span style="color:var(--green);font-weight:700">✅ Ya obtuviste el Sea Angler Outfit</span>':
+    `Faltan <strong style="color:var(--ac)">${lvRemain} niveles</strong> para el skin. Con tu método actual: ~<strong style="color:var(--teal)">${days} días</strong>.`;
+  
+  document.getElementById('fish-tracker-out').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--teal)">${days}</div>
+        <div style="font-size:9px;color:var(--t3)">días estimados</div>
+      </div>
+      <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--gold)">${annuliths}</div>
+        <div style="font-size:9px;color:var(--t3)">Annuliths restantes</div>
+      </div>
+      <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--ac)">${cores}</div>
+        <div style="font-size:9px;color:var(--t3)">Expansion Cores rest.</div>
+      </div>
+    </div>
+    <div style="margin-bottom:8px">${rodTip}</div>
+    <div>${skinStatus}</div>
+    ${lv<4?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 1 — enfocate en juntar Scale Coins para la Rod II antes que nada.</div>':
+      lv<7?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 2 — el loop del Fish Market diario es tu mejor amigo ahora.</div>':
+      lv<10?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 3 — cazá épicos y legendarios, cada captura vale mucho más EXP.</div>':
+      '<div style="margin-top:6px;color:var(--green)">🎣 ¡Master Angler! Disfrutá el skin.</div>'}
+  `;
+}
+
+// Build bait list on load
+buildBaitList();
+updFishTracker();
+
+</script>
+</body>
+</html>
