@@ -593,7 +593,7 @@ body::before {
 
       <div class="sec">
         <span class="sec-t">Roster</span>
-        <span class="sec-n" id="rc">16 PJ</span>
+        <span class="sec-n" id="rc">18 PJ</span>
       </div>
       <div class="cgrid" id="cgrid"></div>
     </div>
@@ -716,12 +716,12 @@ body::before {
     <div class="stat-card">
       <div class="stc-t">AP totales acumulados</div>
       <div class="stc-big" id="st-ap">0</div>
-      <div class="stc-sub">de 896.000 AP posibles (16 PJ × 56K)</div>
+      <div class="stc-sub">de 1.008.000 AP posibles (18 PJ × 56K)</div>
     </div>
     <div class="stat-card">
       <div class="stc-t">Progreso global</div>
       <div class="stc-big" id="st-pct" style="color:var(--ac)">0%</div>
-      <div class="stc-sub" id="st-pct-s">0 / 16 PJ al máximo</div>
+      <div class="stc-sub" id="st-pct-s">0 / 18 PJ al máximo</div>
     </div>
     <div class="stat-card">
       <div class="stc-t">Fons invertidos (estimado)</div>
@@ -1020,32 +1020,47 @@ body::before {
     <div class="box-t"><i class="ti ti-chart-line"></i>Mi progreso de pesca personal
       <span style="margin-left:auto;font-size:10px;color:var(--t3);font-weight:500">Guardado localmente</span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px">
       <div>
-        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Nivel actual de pesca</label>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Nivel actual</label>
         <div style="display:flex;gap:6px">
-          <input type="number" id="fish-lv" min="1" max="10" value="1" style="width:60px;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:14px;font-weight:700;padding:6px 8px;font-family:var(--fd)" oninput="updFishTracker()">
-          <div style="font-family:var(--fd);font-size:11px;color:var(--t2);display:flex;align-items:center">/ 10</div>
+          <input type="number" id="fish-lv" min="1" max="10" value="1" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:14px;font-weight:700;padding:6px 8px;font-family:var(--fd)" oninput="updFishTracker()">
         </div>
       </div>
       <div>
-        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Caña actual</label>
-        <select id="fish-rod" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:11px;padding:6px 8px;font-family:var(--fb)" onchange="updFishTracker()">
-          <option value="1">Rod I · Starter (gris)</option>
-          <option value="2">Rod II · Blue ⭐</option>
-          <option value="3">Rod III · Purple</option>
-          <option value="4">Rod IV · Gold</option>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">XP Actual</label>
+        <div style="display:flex;align-items:center;gap:4px">
+          <input type="number" id="fish-xp" min="0" value="0" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:14px;font-weight:700;padding:6px 8px;font-family:var(--fd)" oninput="updFishTracker()">
+          <span style="font-size:10px;color:var(--t3)">/400</span>
+        </div>
+      </div>
+      <div>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Caña</label>
+        <select id="fish-rod" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:11px;padding:8px 8px;font-family:var(--fb)" onchange="updFishTracker()">
+          <option value="1">Rod I (Starter)</option>
+          <option value="2">Rod II (Blue) ⭐</option>
+          <option value="3">Rod III (Purple)</option>
+          <option value="4">Rod IV (Gold)</option>
         </select>
       </div>
       <div>
-        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Método principal</label>
-        <select id="fish-method" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:11px;padding:6px 8px;font-family:var(--fb)" onchange="updFishTracker()">
-          <option value="casual">Solo comunes (Universal Bait)</option>
-          <option value="market">Loop Fish Market diario</option>
-          <option value="epic">Foco en épicos/legendarios</option>
-          <option value="optimal">Combinado (Market + épicos)</option>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Suerte / Chance</label>
+        <select id="fish-luck" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:11px;padding:8px 8px;font-family:var(--fb)" onchange="updFishTracker()">
+          <option value="0.8">Mala (Pocos raros)</option>
+          <option value="1.0" selected>Normal (Promedio)</option>
+          <option value="1.3">Buena (Muchos épicos)</option>
+          <option value="1.7">Master (Puros legendarios)</option>
         </select>
       </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Método principal de farmeo</label>
+      <select id="fish-method" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:12px;padding:10px 12px;font-family:var(--fb)" onchange="updFishTracker()">
+        <option value="casual">Básico: Pesca casual con Universal Bait (EXP baja)</option>
+        <option value="market">Intermedio: Loop de Fish Market diario (EXP media)</option>
+        <option value="epic">Avanzado: Sniper de peces épicos/legendarios (EXP alta)</option>
+        <option value="optimal">Óptimo: Combinación de Market + Sniper Épico (EXP máxima)</option>
+      </select>
     </div>
     <div id="fish-tracker-out" style="background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:14px;font-size:11px;color:var(--t2);line-height:1.8"></div>
   </div>
@@ -1883,6 +1898,7 @@ function resetDay(){
   if(!confirm('¿Reiniciar los límites diarios de regalos?'))return;
   SFX.play('sweep');
   CHARS.forEach(c=>S.day[c.id]=0);
+  save();
   buildGrid();renderDetail();updHdr();buildPlan();
   toast('Límites diarios reiniciados');
 }
@@ -2053,21 +2069,26 @@ async function proceedWithAdvice(c, cap, gAP, gP, rem, gifts, glist) {
   if (apiKey) {
     const prompt=`Eres un experto analista del videojuego Neverness to Everness (NTE). El jugador tiene a ${c.name} (${c.el}·${c.rar}·${c.role}) en nivel ${lv(cap).level}/10 con ${cap.toLocaleString()} AP. Faltan ${rem.toLocaleString()} AP para el MAX. Usando regalos de ${gAP}AP a ${gP===0?'costo cero':gP.toLocaleString()+'₣'}: necesita ${gifts} regalos en ~${Math.ceil(gifts/3)} días. Regalos favoritos del personaje: ${glist}. También dispone de: Algodón Esponjoso(400AP,Gratis,~20-25/mes) y Ebisu Tower(100AP,Gratis). El jugador tiene ${CHARS.filter(ch=>S.ap[ch.id]>0).length} PJ activos en total. Danos 4-5 líneas concretas de consejo estratégico en español rioplatense (de Argentina, directo y muy informal, e.g. "Che, mirá..."). Habla sobre si gastar Fons o no en este personaje, cuál es el regalo más óptimo y una estimación de tiempo realista. No uses formato markdown.`;
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 250, temperature: 0.7 }
+          generationConfig: { maxOutputTokens: 300, temperature: 0.7 }
         })
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Gemini API Error:', errorData);
+        throw new Error('API_ERROR');
+      }
       const d = await res.json();
       const txt = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      if (!txt) throw new Error();
+      if (!txt) throw new Error('EMPTY_RESPONSE');
       o.textContent = txt.trim();
     } catch(e) {
+      console.error('AI Advice Error:', e);
       o.innerHTML = `<span style="color:var(--red);font-weight:700">⚠️ Error de conexión con Gemini. Usando Asesor de respaldo:</span><br>${generateOfflineAdvice(c, cap, gAP, gP)}`;
     }
   } else {
@@ -2174,13 +2195,29 @@ function updStats(){
   document.getElementById('st-ap').textContent=tAP.toLocaleString();
   document.getElementById('st-pct').textContent=pct+'%';
   document.getElementById('st-pct-s').textContent=`${maxed} / ${CHARS.length} PJ al máximo`;
-  const estFons=CHARS.reduce((acc,c)=>{
+  
+  // Calculate historical spending from log
+  const histFons = Object.keys(S.calLog).reduce((acc, date) => {
+    const dayLog = S.calLog[date];
+    return acc + Object.keys(dayLog).reduce((dAcc, id) => {
+      const c = CHARS.find(x => x.id === id);
+      if (!c) return dAcc;
+      const count = dayLog[id];
+      // Assume they used the most efficient paid gift available for that char
+      const bg = c.gifts.filter(g => g.price > 0).sort((a, b) => (a.price/a.ap) - (b.price/b.ap))[0];
+      return dAcc + (count * (bg ? bg.price : 0));
+    }, 0);
+  }, 0);
+
+  const estRemFons=CHARS.reduce((acc,c)=>{
     const rem=Math.max(0,TOTAL_AP-S.ap[c.id]);
     const bg=c.gifts.filter(g=>g.ap>=200&&g.price>0).sort((a,b)=>(a.price/a.ap)-(b.price/b.ap))[0];
     if(!bg)return acc;
     return acc+Math.ceil(rem/bg.ap)*bg.price;
   },0);
-  document.getElementById('st-fons').textContent=fmt(estFons)+'₣';
+  
+  document.getElementById('st-fons').innerHTML = `<span style="font-size:18px;color:var(--t2);vertical-align:middle">Spent:</span> ${fmt(histFons)}₣ <br> <span style="font-size:18px;color:var(--t2);vertical-align:middle">Rem:</span> ${fmt(estRemFons)}₣`;
+  
   const best=CHARS.reduce((a,b)=>S.ap[a.id]>=S.ap[b.id]?a:b);
   const bLi=lv(S.ap[best.id]);
   document.getElementById('st-best-av').innerHTML=avImg(best,44);
@@ -2200,8 +2237,18 @@ function updStats(){
     </div>`).join('');
   // Activity heatmap last 30 days
   const cells=[];
-  for(let i=29;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const key=d.toISOString().slice(0,10);const log=S.calLog[key]||{};const total=Object.values(log).reduce((a,b)=>a+b,0);const intensity=total===0?0:total<=2?1:total<=5?2:total<=8?3:4;const colors=['var(--bg5)','rgba(124,111,247,.3)','rgba(124,111,247,.55)','rgba(124,111,247,.8)','var(--ac)'];cells.push(`<div class="hm-cell" style="background:${colors[intensity]}" title="${key}: ${total} regalos"></div>`);}
-  document.getElementById('hm').innerHTML=cells.join('');
+  for(let i=29;i>=0;i--){
+    const d=new Date();
+    d.setDate(d.getDate()-i);
+    const key=d.toISOString().slice(0,10);
+    const log=S.calLog[key]||{};
+    const total=Object.values(log).reduce((a,b)=>a+b,0);
+    const intensity=total===0?0:total<=2?1:total<=5?2:total<=8?3:4;
+    const colors=['var(--bg5)','rgba(124,111,247,.3)','rgba(124,111,247,.55)','rgba(124,111,247,.8)','var(--ac)'];
+    cells.push(`<div class="hm-cell" style="background:${colors[intensity]}" title="${key}: ${total} regalos"></div>`);
+  }
+  const hmEl = document.getElementById('hm-stats');
+  if (hmEl) hmEl.innerHTML=cells.join('');
   // Global milestones
   const gms=[
     {name:'50K AP totales',done:tAP>=50000,icon:'⚡'},
@@ -2508,22 +2555,29 @@ function buildBaitList() {
 
 function updFishTracker() {
   const lv = parseInt(document.getElementById('fish-lv').value)||1;
+  const xp = parseInt(document.getElementById('fish-xp').value)||0;
   const rod = parseInt(document.getElementById('fish-rod').value)||1;
+  const luck = parseFloat(document.getElementById('fish-luck').value)||1.0;
   const method = document.getElementById('fish-method').value;
+  
   const lvRemain = Math.max(0,10-lv);
+  const totalXPRem = Math.max(0, (lvRemain * 400) - xp);
   const annuliths = lvRemain*50;
   const cores = lvRemain*3;
   
   // Advanced Metrics
   const methodStats = {
-    casual:  {days:lvRemain*7, expPerFish:15, fishesTotal:Math.round((lvRemain*400)/15)},
-    market:  {days:Math.round(lvRemain*4.5), expPerFish:45, fishesTotal:Math.round((lvRemain*400)/45)},
-    epic:    {days:Math.round(lvRemain*3.5), expPerFish:80, fishesTotal:Math.round((lvRemain*400)/80)},
-    optimal: {days:Math.round(lvRemain*2.5), expPerFish:120, fishesTotal:Math.round((lvRemain*400)/120)}
+    casual:  {expBase: 15, fishesPerDay: 8},
+    market:  {expBase: 45, fishesPerDay: 12},
+    epic:    {expBase: 80, fishesPerDay: 15},
+    optimal: {expBase: 120, fishesPerDay: 20}
   };
+  
   const ms = methodStats[method]||methodStats.casual;
-  const days = ms.days;
-  const dailyFishes = days > 0 ? Math.ceil(ms.fishesTotal / days) : 0;
+  const realExpPerFish = Math.round(ms.expBase * luck);
+  const fishesTotal = Math.ceil(totalXPRem / realExpPerFish);
+  const days = Math.ceil(fishesTotal / ms.fishesPerDay);
+  const dailyFishes = ms.fishesPerDay;
   const staminaCost = dailyFishes * 2; // ~2 stamina per loop (fishing + market/hold)
 
   const rodTip = rod===1?'⚠️ <strong style="color:var(--gold)">Comprá la Rod II lo antes posible</strong> — es el upgrade más importante.':
@@ -2532,7 +2586,7 @@ function updFishTracker() {
                  '🏆 Equipo de pesca máximo. Solo queda pescar!';
   
   const skinStatus = lv>=10?'<span style="color:var(--green);font-weight:700">✅ Ya obtuviste el Sea Angler Outfit</span>':
-    `Faltan <strong style="color:var(--ac)">${lvRemain} niveles</strong> para el skin. Con tu método actual: ~<strong style="color:var(--teal)">${days} días</strong>.`;
+    `Faltan <strong style="color:var(--ac)">${totalXPRem.toLocaleString()} EXP</strong> para el skin. Con tu método y suerte actual: ~<strong style="color:var(--teal)">${days} días</strong>.`;
   
   document.getElementById('fish-tracker-out').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
@@ -2556,9 +2610,12 @@ function updFishTracker() {
     
     <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,184,48,0.06);border-radius:var(--r2);margin-bottom:14px;border:1px dashed rgba(255,184,48,0.2)">
        <div style="font-size:18px">🎣</div>
-       <div>
-         <div style="font-size:11px;font-weight:700;color:var(--t)">Meta Diaria: Pescar ${dailyFishes} peces hoy</div>
-         <div style="font-size:10px;color:var(--t2)">Consumirá aprox. <strong style="color:var(--ac)">${staminaCost} City Stamina</strong> en total (incluyendo ventas).</div>
+       <div style="flex:1">
+         <div style="font-size:11px;font-weight:700;color:var(--t);display:flex;justify-content:space-between">
+           <span>Meta Diaria: Pescar ${dailyFishes} peces hoy</span>
+           <span style="color:var(--teal)">+${realExpPerFish} EXP/pez</span>
+         </div>
+         <div style="font-size:10px;color:var(--t2)">Consumirá aprox. <strong style="color:var(--ac)">${staminaCost} City Stamina</strong>. Necesitás <strong style="color:var(--t)">${fishesTotal}</strong> capturas totales.</div>
        </div>
     </div>
 
@@ -2634,10 +2691,14 @@ const CyberEngine = {
   },
   
   hexToRgb(hex) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return { r, g, b };
+    if (!hex || typeof hex !== 'string') return { r: 124, g: 111, b: 247 };
+    const h = hex.startsWith('#') ? hex.slice(1) : hex;
+    if (h.length !== 6) return { r: 124, g: 111, b: 247 };
+    return {
+      r: parseInt(h.slice(0, 2), 16) || 124,
+      g: parseInt(h.slice(2, 4), 16) || 111,
+      b: parseInt(h.slice(4, 6), 16) || 247
+    };
   },
   
   updateColors() {
@@ -2663,12 +2724,16 @@ const CyberEngine = {
     const cStr = `${Math.round(this.currentColor.r)},${Math.round(this.currentColor.g)},${Math.round(this.currentColor.b)}`;
     
     this.ctx.lineWidth = 0.5;
+    const maxDistSq = 12100; // 110 * 110
     for (let i = 0; i < this.particles.length; i++) {
       const pi = this.particles[i];
       for (let j = i + 1; j < this.particles.length; j++) {
         const pj = this.particles[j];
-        const dist = Math.hypot(pi.x - pj.x, pi.y - pj.y);
-        if (dist < 110) {
+        const dx = pi.x - pj.x;
+        const dy = pi.y - pj.y;
+        const distSq = dx * dx + dy * dy;
+        if (distSq < maxDistSq) {
+          const dist = Math.sqrt(distSq);
           const lineAlpha = (1 - dist / 110) * 0.1;
           this.ctx.strokeStyle = `rgba(${cStr},${lineAlpha})`;
           this.ctx.beginPath();
