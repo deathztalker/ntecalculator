@@ -2682,42 +2682,58 @@ function updFishTracker() {
   const marketCoinBoost = marketFishes > 0 ? `<span style="color:var(--ac)">+300% Scale Coins en ${marketFishes} peces</span>` : `Sin bonus de mercado`;
 
   document.getElementById('fish-tracker-out').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-      <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
-        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--teal)">${days}</div>
-        <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Días aprox.</div>
+    <!-- PANEL 1: PROGRESO HACIA NIVEL 10 -->
+    <div style="margin-bottom:16px">
+      <div style="font-family:var(--fd);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--t);margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-target" style="color:var(--teal)"></i> El camino al Nivel 10 (Skin)</div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:8px">
+        <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center;box-shadow:inset 0 0 12px rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2)">
+          <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--teal)">${lv>=10?'MAX':days}</div>
+          <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Días estimados</div>
+        </div>
+        <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
+          <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--gold)">${annuliths}</div>
+          <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Annuliths por sacar</div>
+        </div>
+        <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
+          <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--ac)">${cores}</div>
+          <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Cores por sacar</div>
+        </div>
       </div>
-      <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center;box-shadow:inset 0 0 12px rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2)">
-        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--green)">${dailyFishingExp}</div>
-        <div style="font-size:9px;color:var(--t3);text-transform:uppercase">EXP / Día</div>
+      
+      <div style="font-size:10px;color:var(--t2);line-height:1.5">
+        ${skinStatus}<br>
+        ${lv<4?'<span style="color:var(--gold)">📍 Fase 1:</span> Juntá Scale Coins para la Rod II vendiendo todo en Fish Hold.':
+          lv<7?'<span style="color:var(--gold)">📍 Fase 2:</span> Usá el Fish Market diario para multiplicar tus Scale Coins y comprar mejor cebo.':
+          lv<10?'<span style="color:var(--gold)">📍 Fase 3:</span> Enfocate en cazar épicos y legendarios, la experiencia que dan es masiva.':
+          '<span style="color:var(--green)">🎣 ¡Ya sos Master Angler!</span>'}
       </div>
-      <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
-        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--gold)">${fmt(fonsGen)}</div>
-        <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Fons / Día</div>
-      </div>
-      <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
-        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--ac)">${actualDailyFishes}</div>
-        <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Peces a pescar</div>
-      </div>
+      <div style="margin-top:6px;font-size:10px;color:var(--t3)">${rodTip}</div>
     </div>
     
-    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,184,48,0.06);border-radius:var(--r2);margin-bottom:14px;border:1px dashed rgba(255,184,48,0.2)">
-       <div style="font-size:18px">🎣</div>
-       <div style="flex:1">
-         <div style="font-size:11px;font-weight:700;color:var(--t);display:flex;justify-content:space-between">
-           <span>Economía Diaria Proyectada</span>
-           <span style="color:var(--teal)">${marketCoinBoost}</span>
-         </div>
-         <div style="font-size:10px;color:var(--t2);line-height:1.5">Al vender <strong style="color:var(--ac)">${actualDailyFishes} peces</strong> consumís <strong style="color:var(--red)">${actualDailyFishes} City Stamina</strong>. Obtenés <strong style="color:var(--gold)">${fonsGen.toLocaleString()} Fons</strong> y aprox. <strong style="color:var(--pink)">${actualDailyFishes * 10} City Tycoon EXP</strong>. ${actualDailyFishes > dailyStam ? '<br><em style="color:var(--gold)">⚠ Estás pescando más peces de la stamina disponible. Los excedentes darán Scale Coins pero NO Fons.</em>' : ''}</div>
-       </div>
-    </div>
+    <div style="height:1px;background:var(--b2);margin:16px 0"></div>
 
-    <div style="margin-bottom:8px">${rodTip}</div>
-    <div>${skinStatus}</div>
-    ${lv<4?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 1 — enfocate en juntar Scale Coins para la Rod II vendiendo en Fish Hold.</div>':
-      lv<7?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 2 — el loop del Fish Market diario (2 peces premium) es vital para tu economía.</div>':
-      lv<10?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 3 — cazá épicos y legendarios, cada captura vale muchísimo más EXP.</div>':
-      '<div style="margin-top:6px;color:var(--green)">🎣 ¡Master Angler! Disfrutá el skin.</div>'}
+    <!-- PANEL 2: ECONOMIA DIARIA -->
+    <div>
+      <div style="font-family:var(--fd);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--t);margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-coin" style="color:var(--gold)"></i> Tu Economía de Hoy</div>
+      
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,184,48,0.06);border-radius:var(--r2);margin-bottom:8px;border:1px dashed rgba(255,184,48,0.2)">
+         <div style="font-size:18px">💰</div>
+         <div style="flex:1">
+           <div style="font-size:11px;font-weight:700;color:var(--t);display:flex;justify-content:space-between">
+             <span>Neto esperado hoy:</span>
+             <span style="color:var(--gold);font-family:var(--fd)">+${fmt(fonsGen)} Fons</span>
+           </div>
+           <div style="font-size:10px;color:var(--t2);line-height:1.5">Al pescar y vender <strong style="color:var(--ac)">${actualDailyFishes} peces</strong>, vas a gastar <strong style="color:var(--red)">${Math.min(actualDailyFishes, dailyStam)} City Stamina</strong>. También sumarás aprox. <strong style="color:var(--pink)">${Math.min(actualDailyFishes, dailyStam) * 10} Tycoon EXP</strong> y <strong style="color:var(--green)">${dailyFishingExp} EXP de Pesca</strong>.</div>
+         </div>
+      </div>
+      
+      <div style="font-size:10px;color:var(--t3);display:flex;justify-content:space-between">
+        <span>Estrategia: ${sellMethod==='market_only'?'Solo Mercado (Poca Stamina)':sellMethod==='market_hold'?'Mercado + Bodega (Balanceado)':'Solo Bodega'}</span>
+        <span>${marketCoinBoost}</span>
+      </div>
+      ${actualDailyFishes > dailyStam ? '<div style="margin-top:6px;font-size:10px;color:var(--gold)">⚠ Atención: Según tu método, vas a pescar más peces de los que podés vender con Stamina. Los peces extra te darán EXP y Scale Coins, pero <strong>NO darán Fons</strong>.</div>' : ''}
+    </div>
   `;
 }
 
