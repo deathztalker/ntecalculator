@@ -467,6 +467,7 @@ body::before{content:'';position:fixed;inset:0;
     <div class="hpill gr"><i class="ti ti-crown" style="font-size:11px"></i><b id="hm">0</b> MAX</div>
     <button class="hdr-btn" onclick="exportData()" title="Exportar progreso"><i class="ti ti-download" style="font-size:12px"></i>Backup</button>
     <button class="hdr-btn" onclick="document.getElementById('imp-file').click()" title="Importar progreso"><i class="ti ti-upload" style="font-size:12px"></i></button>
+    <button class="hdr-btn" id="vol-btn" onclick="toggleMute()" title="Activar/Silenciar sonido"><i class="ti ti-volume" style="font-size:12px"></i></button>
     <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importData(event)">
   </div>
 </header>
@@ -504,9 +505,10 @@ body::before{content:'';position:fixed;inset:0;
       </div>
 
       <!-- SEARCH -->
-      <div class="search-wrap">
+      <div class="search-wrap" style="position:relative">
         <i class="ti ti-search search-ico"></i>
-        <input class="search-inp" type="text" placeholder="Buscar personaje o elemento…" oninput="onSearch(this.value)">
+        <input class="search-inp" id="search-bar" type="text" placeholder="Buscar personaje o elemento…" oninput="onSearch(this.value)">
+        <i class="ti ti-x search-clear" id="search-clear-btn" style="position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:15px;cursor:pointer;display:none;transition:color .2s" onclick="clearSearch()" onmouseenter="this.style.color='var(--t)'" onmouseleave="this.style.color='var(--t3)'" title="Limpiar búsqueda"></i>
       </div>
 
       <!-- FILTERS -->
@@ -564,6 +566,29 @@ body::before{content:'';position:fixed;inset:0;
       <div class="box" style="margin-bottom:14px">
         <div class="box-t"><i class="ti ti-route"></i>Rutina óptima de hoy</div>
         <div id="daily-plan"></div>
+      </div>
+      
+      <div class="box" style="margin-bottom:14px">
+        <div class="box-t"><i class="ti ti-bolt"></i>Simulador de Stamina Diaria</div>
+        <div style="font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:14px">
+          Convertí tu City Stamina en Fons y AP para tus personajes de forma 100% eficiente.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div>
+            <label style="font-family:var(--fd);font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Stamina Diaria</label>
+            <input type="number" id="stam-inp" min="10" max="300" value="120" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:13px;font-weight:700;padding:6px 10px;font-family:var(--fd)" oninput="updStaminaSim()">
+          </div>
+          <div>
+            <label style="font-family:var(--fd);font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Estrategia</label>
+            <select id="stam-strat" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:11px;padding:6px 10px;font-family:var(--fb)" onchange="updStaminaSim()">
+              <option value="balanced">Balanceada (Pesca + Regalos)</option>
+              <option value="fons">Full Fons (Ahorro de capital)</option>
+              <option value="bond">Full Vínculo (Regalos eficientes)</option>
+            </select>
+          </div>
+        </div>
+        <div id="stam-sim-out" style="background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:12px;font-size:11px;color:var(--t2);line-height:1.75">
+        </div>
       </div>
       <div class="box">
         <div class="box-t"><i class="ti ti-trophy"></i>Milestones</div>
@@ -1034,7 +1059,20 @@ body::before{content:'';position:fixed;inset:0;
       <div style="font-size:11px;color:var(--t2);line-height:1.7;margin-bottom:14px">
         Borrá todo el progreso guardado y empezá de cero. <strong style="color:var(--red)">Esta acción no se puede deshacer.</strong>
       </div>
-      <button class="apbtn" style="background:var(--red)" onclick="if(confirm('¿BORRAR TODO el progreso? No se puede deshacer.')){localStorage.removeItem('nte_v4');location.reload();}">Borrar todo el progreso</button>
+      <button class="apbtn" style="background:var(--red)" onclick="if(confirm('¿BORRAR TODO el progreso? No se puede deshacer.')){SFX.play('sweep');localStorage.removeItem('nte_v4');location.reload();}">Borrar todo el progreso</button>
+    </div>
+    
+    <div class="box" style="grid-column: 1 / -1">
+      <div class="box-t"><i class="ti ti-cpu"></i>Configuración de Asesor I.A. (Opcional)</div>
+      <div style="font-size:11.5px;color:var(--t2);line-height:1.75;margin-bottom:14px">
+        Por defecto, el tracker usa un potente asesor local inteligente offline. Si preferís usar Inteligencia Artificial real para analizar tus estadísticas, ingresá tu <strong>API Key de Google Gemini</strong> (se guarda de forma 100% segura en tu navegador local). Podés conseguir una clave gratis en Google AI Studio.
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="text" id="ai-key-inp" placeholder="Ingresá tu API Key de Gemini..." style="flex:1;min-width:240px;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:12.5px;padding:9px 12px;font-family:var(--fb)">
+        <button class="apbtn" style="background:var(--ac)" onclick="saveAIKey()">Guardar Key</button>
+        <button class="apbtn" style="background:var(--red)" onclick="clearAIKey()">Eliminar Key</button>
+      </div>
+      <div id="ai-key-status" style="font-size:10.5px;color:var(--t3);margin-top:8px;font-weight:700"></div>
     </div>
   </div>
 </div>
@@ -1368,10 +1406,227 @@ function elCol(el){return{Cosmos:'var(--cosmos)',Anima:'var(--anima)',Incantatio
 function dt(){return Object.values(S.day).reduce((a,b)=>a+b,0);}
 function fmt(n){return n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?(n/1000).toFixed(0)+'K':n.toString();}
 function todayKey(){return new Date().toISOString().slice(0,10);}
+function renderProceduralAvatar(c, size, extra='') {
+  const initials = ini(c.name);
+  const strokeColor = c.col || 'var(--ac)';
+  const glowId = `glow-${c.id}-${size}`;
+  const gradId = `grad-${c.id}-${size}`;
+  
+  return `
+    <svg width="${size}" height="${size}" viewBox="0 0 64 64" style="border-radius:50%;flex-shrink:0;display:inline-block;box-shadow:0 0 8px ${strokeColor}44;vertical-align:middle;${extra}" alt="${c.name}">
+      <defs>
+        <filter id="${glowId}" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+        <linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#090912" />
+          <stop offset="100%" stop-color="${strokeColor}44" />
+        </linearGradient>
+      </defs>
+      <circle cx="32" cy="32" r="31" fill="url(#${gradId})" stroke="${strokeColor}66" stroke-width="1" />
+      <circle cx="32" cy="32" r="25" fill="none" stroke="${strokeColor}22" stroke-width="0.5" stroke-dasharray="2,2" />
+      <line x1="10" y1="32" x2="54" y2="32" stroke="${strokeColor}11" stroke-width="0.5" />
+      <line x1="32" y1="10" x2="32" y2="54" stroke="${strokeColor}11" stroke-width="0.5" />
+      <circle cx="32" cy="32" r="28" fill="none" stroke="${strokeColor}" stroke-width="1.2" stroke-dasharray="35,15,5,15" filter="url(#${glowId})" />
+      <text x="32" y="38" text-anchor="middle" fill="#fff" font-family="var(--fd)" font-size="15" font-weight="900" style="text-shadow:0 0 6px ${strokeColor}" letter-spacing="-0.5">${initials}</text>
+    </svg>
+  `;
+}
+
 function avImg(c,size,extra=''){
   const p=c.img && c.img.length>0 ? c.img : CHAR_PORTRAITS[c.id];
-  if(p && p.length>0)return`<img src="${p}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;${extra}" alt="${c.name}" onerror="this.outerHTML='<div style=\\'width:${size}px;height:${size}px;border-radius:50%;background:${c.col};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*.3)}px;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--fd)\\'>${ini(c.name)}</div>'">`;
-  return`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${c.col};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*.3)}px;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--fd)">${ini(c.name)}</div>`;
+  if(p && p.length>0) {
+    const fallback = renderProceduralAvatar(c, size, extra).replace(/\n/g, '').replace(/'/g, "\\'");
+    return `<img src="${p}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;${extra}" alt="${c.name}" onerror="this.outerHTML='${fallback}'">`;
+  }
+  return renderProceduralAvatar(c, size, extra);
+}
+
+function renderRadarChart(c) {
+  const isDPS = c.role.includes('DPS') || c.role.includes('Burst') || c.role.includes('DoT') || c.role.includes('Burst DPS');
+  const isTank = c.role.includes('Tank') || c.role.includes('Survival') || c.role.includes('Healer') || c.role.includes('Buffer');
+  const dpsVal = isDPS ? (c.rar === 'S' ? 95 : 82) : 45;
+  const survVal = isTank ? (c.rar === 'S' ? 92 : 80) : (c.role.includes('Healer') ? 75 : 40);
+  const isSpecialEl = c.el === 'Chaos' || c.el === 'Incantation' || c.el === 'Anima';
+  const elVal = isSpecialEl ? 90 : 70;
+  const cheapG = c.gifts.filter(g=>g.price!==null && g.price>0).sort((a,b)=>a.price-b.price)[0];
+  const effVal = cheapG ? Math.max(10, Math.round(100 - (cheapG.price / 20000) * 90)) : 100;
+  const bondVal = Math.max(10, Math.round(S.ap[c.id]/TOTAL_AP*100));
+  
+  const metrics = [dpsVal, survVal, elVal, effVal, bondVal];
+  const labels = ['DPS', 'Survival', 'Element', 'Efficiency', 'Bond'];
+  const cx = 90, cy = 82, r = 55;
+  
+  let gridPaths = "";
+  const gridScales = [0.25, 0.5, 0.75, 1.0];
+  gridScales.forEach(scale => {
+    const pts = [];
+    for (let i = 0; i < 5; i++) {
+      const angle = -Math.PI / 2 + i * (2 * Math.PI / 5);
+      const x = cx + r * scale * Math.cos(angle);
+      const y = cy + r * scale * Math.sin(angle);
+      pts.push(`${x},${y}`);
+    }
+    gridPaths += `<polygon points="${pts.join(' ')}" fill="none" stroke="var(--b3)" stroke-width="0.75" stroke-dasharray="2,2" />`;
+  });
+  
+  let webLines = "";
+  for (let i = 0; i < 5; i++) {
+    const angle = -Math.PI / 2 + i * (2 * Math.PI / 5);
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    webLines += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--b3)" stroke-width="0.75" />`;
+  }
+  
+  const valPts = [];
+  metrics.forEach((val, i) => {
+    const scale = val / 100;
+    const angle = -Math.PI / 2 + i * (2 * Math.PI / 5);
+    const x = cx + r * scale * Math.cos(angle);
+    const y = cy + r * scale * Math.sin(angle);
+    valPts.push(`${x},${y}`);
+  });
+  
+  let labelsHtml = "";
+  const offset = [
+    {x: 0, y: -7},
+    {x: 7, y: 3},
+    {x: 5, y: 8},
+    {x: -5, y: 8},
+    {x: -7, y: 3}
+  ];
+  labels.forEach((lbl, i) => {
+    const angle = -Math.PI / 2 + i * (2 * Math.PI / 5);
+    const x = cx + (r + 12) * Math.cos(angle) + offset[i].x;
+    const y = cy + (r + 8) * Math.sin(angle) + offset[i].y;
+    let anchor = "middle";
+    if (i === 1 || i === 2) anchor = "start";
+    if (i === 3 || i === 4) anchor = "end";
+    labelsHtml += `<text x="${x}" y="${y}" text-anchor="${anchor}" fill="var(--t2)" font-family="var(--fd)" font-size="8" font-weight="800" letter-spacing="0.5">${lbl}</text>`;
+  });
+  
+  const chartHtml = `
+    <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:14px;display:flex;align-items:center;gap:16px;margin-top:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)">
+      <div style="width:170px;height:155px;flex-shrink:0;position:relative">
+        <svg width="170" height="155" style="display:block;margin:0 auto">
+          ${gridPaths}
+          ${webLines}
+          <polygon points="${valPts.join(' ')}" fill="${c.col}22" stroke="${c.col}" stroke-width="2" />
+          ${valPts.map((pt, i) => {
+            const [x, y] = pt.split(',');
+            return `<circle cx="${x}" cy="${y}" r="2.5" fill="#fff" stroke="${c.col}" stroke-width="1.5" />`;
+          }).join('')}
+          ${labelsHtml}
+        </svg>
+      </div>
+      <div style="flex:1">
+        <div style="font-family:var(--fd);font-size:9.5px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--t);margin-bottom:8px"><i class="ti ti-chart-radar" style="color:${c.col};font-size:12px;vertical-align:text-bottom"></i> Atributos del PJ</div>
+        <div style="display:grid;grid-template-columns:1fr;gap:4px">
+          <div style="display:flex;justify-content:space-between;font-size:10px">
+            <span style="color:var(--t2)">DPS / Ráfaga:</span>
+            <strong style="color:var(--t)">${dpsVal}%</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px">
+            <span style="color:var(--t2)">Supervivencia:</span>
+            <strong style="color:var(--t)">${survVal}%</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px">
+            <span style="color:var(--t2)">Elemento:</span>
+            <strong style="color:var(--t)">${elVal}%</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px">
+            <span style="color:var(--t2)">Costo Regalos:</span>
+            <strong style="color:var(--t)">${effVal}%</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px">
+            <span style="color:var(--t2)">Vínculo:</span>
+            <strong style="color:${c.col}">${bondVal}%</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  return chartHtml;
+}
+
+function renderEfficiencyChart(c) {
+  const buyGifts = c.gifts.filter(g => g.price !== null && g.price >= 0);
+  if (!buyGifts.length) return "";
+  
+  const cheapFons = c.gifts.filter(g=>g.price!==null&&g.price>0).sort((a,b)=>(a.price/a.ap)-(b.price/b.ap))[0];
+  const rows = buyGifts.map(g => {
+    const ratio = g.price === 0 ? 0 : parseFloat((g.price / g.ap).toFixed(1));
+    let color = "var(--green)";
+    let text = "Excelente (F2P)";
+    if (ratio > 0) {
+      if (ratio <= 10) {
+        color = "var(--teal)";
+        text = `Muy Bueno (${ratio} ₣/AP)`;
+      } else if (ratio <= 15) {
+        color = "var(--gold)";
+        text = `Aceptable (${ratio} ₣/AP)`;
+      } else {
+        color = "var(--red)";
+        text = `¡Muy Caro! (${ratio} ₣/AP)`;
+      }
+    }
+    const maxVal = Math.max(...buyGifts.map(x => x.price === 0 ? 0 : x.price / x.ap), 15);
+    const pct = ratio === 0 ? 5 : Math.min(100, Math.round((ratio / maxVal) * 100));
+    
+    return `
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px">
+          <span style="color:var(--t);font-weight:600">${g.name} <span style="color:var(--t3);font-size:9px">(+${g.ap} AP)</span></span>
+          <span style="color:${color};font-weight:800;font-size:9.5px">${text}</span>
+        </div>
+        <div style="height:5px;background:rgba(0,0,0,0.3);border-radius:99px;overflow:hidden;border:1px solid rgba(255,255,255,0.01)">
+          <div style="height:100%;width:${pct}%;background:${color};border-radius:99px;box-shadow:0 0 6px ${color}88"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  return `
+    <div style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--b2);border-radius:var(--r2);box-shadow:inset 0 1px 0 rgba(255,255,255,0.01)">
+      <div style="font-family:var(--fd);font-size:9.5px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--t);margin-bottom:10px"><i class="ti ti-scale" style="color:var(--ac);font-size:12px;vertical-align:text-bottom"></i> Eficiencia del Regalo (Fons/AP)</div>
+      <div>${rows}</div>
+      <div style="font-size:9px;color:var(--t3);margin-top:6px;line-height:1.4">
+        * Cuanto más corta sea la barra, menor es el coste en Fons por cada 1 AP. ¡Evitá barras rojas!
+      </div>
+    </div>
+  `;
+}
+
+function updStaminaSim() {
+  const stam = parseInt(document.getElementById('stam-inp').value) || 120;
+  const strat = document.getElementById('stam-strat').value;
+  
+  let fishStam = 0, fonsGen = 0, giftsBought = 0, apGain = 0;
+  let summary = "";
+  
+  if (strat === 'balanced') {
+    fishStam = Math.round(stam * 0.6);
+    fonsGen = fishStam * 1000;
+    giftsBought = Math.floor(fonsGen / 2500);
+    apGain = giftsBought * 400;
+    summary = `💡 <strong>Estrategia Balanceada:</strong> Gastá <strong style="color:var(--teal)">${fishStam} Stamina</strong> pescando en spots diarios recomendados. Vas a generar aprox. <strong style="color:var(--gold)">${fonsGen.toLocaleString()} ₣</strong> vendiendo en Fish Hold/Market. Con esa plata podés comprar <strong>${giftsBought} regalos</strong> eficientes (+400 AP c/u) para tus personajes activos, ganando <strong style="color:var(--ac)">+${apGain.toLocaleString()} AP</strong> diarios sin perder capital.`;
+  } else if (strat === 'fons') {
+    fishStam = stam;
+    fonsGen = fishStam * 1000;
+    giftsBought = 0;
+    apGain = 0;
+    summary = `💰 <strong>Estrategia de Full Ahorro:</strong> Invertí el <strong style="color:var(--teal)">100% de tu Stamina (${stam})</strong> en la pesca diaria y vendé todo en demanda. Generarás la friolera de <strong style="color:var(--gold)">${fonsGen.toLocaleString()} ₣</strong> diarios en neto. Reservá este capital. Para subir vínculos, dependé únicamente de los regalos F2P gratuitos (Algodón Esponjoso de las anomalías).`;
+  } else {
+    fishStam = Math.round(stam * 0.9);
+    fonsGen = fishStam * 1000;
+    giftsBought = Math.min(10, Math.floor(fonsGen / 2000));
+    apGain = giftsBought * 200;
+    summary = `🔥 <strong>Estrategia de Vínculo Veloz:</strong> Quemá <strong style="color:var(--teal)">${fishStam} Stamina</strong> pescando para acumular <strong style="color:var(--gold)">${fonsGen.toLocaleString()} ₣</strong>. Comprá hasta <strong>${giftsBought} regalos de Mejor Valor</strong> en la tienda de música (ej. Waltz para Mint) y agotá el límite de regalos diario (10/10) a máxima velocidad, sumando <strong style="color:var(--ac)">+${apGain.toLocaleString()} AP</strong> diarios.`;
+  }
+  
+  const el = document.getElementById('stam-sim-out');
+  if (el) el.innerHTML = summary;
 }
 
 // FILTER + SEARCH
@@ -1381,7 +1636,20 @@ function sf(f,btn){
   btn.classList.add('on');
   buildGrid();
 }
-function onSearch(val){S.search=val.toLowerCase();buildGrid();}
+function onSearch(val){
+  S.search=val.toLowerCase();
+  const clearBtn = document.getElementById('search-clear-btn');
+  if (clearBtn) {
+    clearBtn.style.display = val ? 'block' : 'none';
+  }
+  buildGrid();
+}
+function clearSearch() {
+  SFX.play('tap');
+  const bar = document.getElementById('search-bar');
+  if (bar) bar.value = '';
+  onSearch('');
+}
 function charOk(c){
   if(S.search&&!c.name.toLowerCase().includes(S.search)&&!c.el.toLowerCase().includes(S.search))return false;
   if(S.filter==='all')return true;
@@ -1431,7 +1699,7 @@ function updHdr(){
 }
 
 // DETAIL
-function selChar(id){S.sel=id;buildGrid();renderDetail();}
+function selChar(id){SFX.play('tap');S.sel=id;buildGrid();renderDetail();}
 function renderDetail(){
   const box=document.getElementById('detail');
   const c=CHARS.find(x=>x.id===S.sel);
@@ -1506,11 +1774,13 @@ function renderDetail(){
         <div class="bmeta">${li.inL.toLocaleString()} / ${li.need.toLocaleString()} AP en niv.${li.level} · Faltan ${remAP.toLocaleString()} AP para MAX</div>
         ${c.buff ? `<div class="bbuff" title="Motivo principal para subir el vínculo a nivel 10"><i class="ti ti-trending-up"></i> Stat Pasivo (Niv. 10): <span style="color:var(--gold)">${c.buff}</span></div>` : ''}
         ${optHtml}
+        ${renderRadarChart(c)}
         <div class="unlocks" style="margin-top:10px">${unlR}</div>
       </div>
       <div class="dp-sec">
         <div class="dp-sec-t"><i class="ti ti-gift" style="font-size:12px"></i>Regalos favoritos <span>${cD}/3 hoy · ${dT}/10 total diario</span></div>
-        ${giftR}
+        ${renderEfficiencyChart(c)}
+        <div style="margin-top:10px">${giftR}</div>
         <div class="gmsg">${msg}</div>
       </div>
       ${c.guide ? `<div class="dp-sec g-guide"><div style="margin-bottom:8px;font-weight:600;color:var(--tx);font-family:var(--fd)"><i class="ti ti-swords"></i> Guía Estratégica & Combos</div>${c.guide}</div>` : ''}
@@ -1522,6 +1792,7 @@ function renderDetail(){
   }));
 }
 function setAP(id){
+  SFX.play('tap');
   const lv=Math.max(1,Math.min(10,parseInt(document.getElementById('ap-lv').value)||1));
   const inL=Math.max(0,Math.min(5600,parseInt(document.getElementById('ap-rem').value)||0));
   let v = THRESH[lv-1] + inL;
@@ -1538,10 +1809,21 @@ function giveGift(id,ap){
   S.calLog[k][id]=(S.calLog[k][id]||0)+1;
   save();buildGrid();renderDetail();updSum();updStats();buildPlan();
   const cname=CHARS.find(c=>c.id===id).name;
-  if(now>prev)toast(`🎉 ¡${cname} subió al nivel ${now}!`);
-  else toast(`+${ap} AP para ${cname}`);
+  if(now>prev) {
+    SFX.play('levelup');
+    toast(`🎉 ¡${cname} subió al nivel ${now}!`);
+  } else {
+    SFX.play('give');
+    toast(`+${ap} AP para ${cname}`);
+  }
 }
-function resetDay(){if(!confirm('¿Reiniciar los límites diarios de regalos?'))return;CHARS.forEach(c=>S.day[c.id]=0);buildGrid();renderDetail();updHdr();buildPlan();toast('Límites diarios reiniciados');}
+function resetDay(){
+  if(!confirm('¿Reiniciar los límites diarios de regalos?'))return;
+  SFX.play('sweep');
+  CHARS.forEach(c=>S.day[c.id]=0);
+  buildGrid();renderDetail();updHdr();buildPlan();
+  toast('Límites diarios reiniciados');
+}
 
 // CALC
 function buildCalc(){
@@ -1603,7 +1885,80 @@ function updSum(){
 }
 
 // AI
+function saveAIKey() {
+  SFX.play('tap');
+  const key = document.getElementById('ai-key-inp').value.trim();
+  if (key) {
+    localStorage.setItem('nte_v4_apikey', key);
+    document.getElementById('ai-key-status').textContent = '✓ API Key de Gemini guardada de forma segura.';
+    document.getElementById('ai-key-status').style.color = 'var(--green)';
+    toast('API Key guardada ✓');
+  } else {
+    clearAIKey();
+  }
+}
+function clearAIKey() {
+  SFX.play('sweep');
+  localStorage.removeItem('nte_v4_apikey');
+  document.getElementById('ai-key-inp').value = '';
+  document.getElementById('ai-key-status').textContent = '📍 Usando Asesor Inteligente Offline (instantáneo).';
+  document.getElementById('ai-key-status').style.color = 'var(--t3)';
+  toast('API Key eliminada');
+}
+
+function generateOfflineAdvice(c, cap, gAP, gP) {
+  const li = lv(cap);
+  const rem = Math.max(0, TOTAL_AP - cap);
+  const gifts = Math.ceil(rem / gAP);
+  const days = Math.ceil(gifts / 3);
+  
+  if (rem === 0) {
+    return `¡Che, felicitaciones! Tenés a ${c.name} al máximo nivel de vínculo (Nivel 10). Ya tenés desbloqueado su stat pasivo "${c.buff}" y todas sus interacciones y recompensas en casa. ¡Ya no hay nada que calcular acá, a disfrutar del personaje!`;
+  }
+  
+  let intro = "";
+  if (c.rar === 'S') {
+    intro = `¡Qué locura de personaje! ${c.name} es un clase-S de elemento ${c.el} (${c.role}) con un potencial tremendo. Actualmente lo tenés en Nivel ${li.level}/10 con ${cap.toLocaleString()} AP totales. `;
+  } else {
+    intro = `Che, ${c.name} es un clase-A de elemento ${c.el} (${c.role}) super sólido y muy accesible. Lo tenés en Nivel ${li.level}/10 con ${cap.toLocaleString()} AP totales. `;
+  }
+  
+  let strategy = "";
+  if (gP === 0) {
+    strategy += `La estrategia que elegiste usando regalos gratis (+${gAP} AP) es la gloria absoluta para tu economía de Fons. Necesitás exactamente ${gifts} unidades, lo que te va a tomar unos ${days} días dándole 3 por día. `;
+  } else if (gP >= 20000) {
+    strategy += `⚠️ ¡Epa, ojo ahí! La Bunny Box de 20.000 Fons es un robo a mano armada. Si usás ese regalo para ${c.name}, te vas a fundir: necesitás ${gifts} cajas = ¡${(gifts*gP).toLocaleString()} Fons! Frená la mano y priorizá a full el Algodón Esponjoso o regalos más eficientes de 2.000 Fons como ${c.gifts.find(g=>g.price===2000)?.name || 'Waltz'} en tiendas. `;
+  } else {
+    const totalCost = gifts * gP;
+    strategy += `Con el regalo seleccionado (${c.gifts.find(g=>g.ap===gAP)?.name || 'favorito'}, +${gAP} AP a ${gP.toLocaleString()} Fons) vas a precisar ${gifts} unidades. Esto te va a costar unas ${totalCost.toLocaleString()} Fons y te va a tomar un mínimo de ${days} días. `;
+  }
+  
+  let recommendation = "";
+  const buyGifts = c.gifts.filter(g => g.price > 0 && g.ap >= 200);
+  const bestValue = buyGifts.sort((a,b) => (a.price/a.ap) - (b.price/b.ap))[0];
+  const f2pGift = c.gifts.find(g => g.price === 0);
+  
+  if (bestValue) {
+    recommendation += `Si querés optimizar Fons, su regalo pago más costo-eficiente es "${bestValue.name}" (AP/Fons óptimo). `;
+  }
+  if (f2pGift) {
+    recommendation += `Combinar esto metiendo al menos 1 "${f2pGift.name}" gratis al día es clave para recortar costos a la mitad. `;
+  } else {
+    recommendation += `Tratá de clavarle Algodón Esponjoso de las anomalías de tu casa de forma diaria; te ahorrás miles de Fons a la larga. `;
+  }
+  
+  let conclusion = "";
+  if (days > 15) {
+    conclusion += `Es una carrera de larga distancia (estimado en ~${Math.ceil(days/7)} semanas). Paciencia, no quemes tus Fons de golpe y mantené el hábito diario.`;
+  } else {
+    conclusion += `Lo tenés al alcance de la mano. En aproximadamente ${days} días bien organizados lo dejás en MAX. ¡Metele pata!`;
+  }
+  
+  return intro + strategy + recommendation + conclusion;
+}
+
 async function askAI(){
+  SFX.play('tap');
   const cid=document.getElementById('cc').value;
   const cap=parseInt(document.getElementById('cap').value)||0;
   const gAP=parseInt(document.getElementById('cg').value)||400;
@@ -1611,16 +1966,51 @@ async function askAI(){
   const c=CHARS.find(x=>x.id===cid);if(!c)return;
   const li=lv(cap),rem=Math.max(0,TOTAL_AP-cap),gifts=Math.ceil(rem/gAP);
   const glist=c.gifts.map(g=>`${g.name}(+${g.ap}AP,${g.price===0?'Gratis':g.price===-1?'Canjeable':g.price===null?'nc':g.price+'₣'})`).join(', ');
-  const totalFons=CHARS.reduce((acc,ch)=>{const r=Math.max(0,TOTAL_AP-S.ap[ch.id]);return acc+Math.ceil(r/400)*3500;},0);
-  const prompt=`Sos un experto en NTE (Neverness to Everness). El jugador tiene a ${c.name} (${c.el}·${c.rar}·${c.role}) en nivel ${li.level}/10 con ${cap.toLocaleString()} AP. Faltan ${rem.toLocaleString()} AP. Usando regalos de ${gAP}AP a ${gP===0?'costo cero':gP.toLocaleString()+'₣'}: necesita ${gifts} regalos en ~${Math.ceil(gifts/3)} días. Regalos favoritos: ${glist}. También hay: Algodón Esponjoso(400AP,Gratis,~20-25/mes) y Ebisu Tower(100AP,Gratis). El jugador tiene ${CHARS.filter(ch=>S.ap[ch.id]>0).length} PJ activos en total. Consejos concretos en español rioplatense (4-5 líneas, sin markdown): regalo más eficiente, si conviene gastar Fons o no, combinación ideal con gratuitos, y estimación de tiempo total. Sé directo y práctico.`;
+  
   const o=document.getElementById('ai-o');
-  o.innerHTML='<div class="ai-ld"><div class="dot"></div><div class="dot"></div><div class="dot"></div>&nbsp;Analizando tu progreso…</div>';
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    const d=await res.json();
-    const txt=d.content?.map(b=>b.text||'').join('')||'Sin respuesta.';
-    o.textContent=txt;
-  }catch(e){o.textContent='Error de conexión. Revisá tu red e intentá de nuevo.';}
+  o.innerHTML='<div class="ai-ld"><div class="dot"></div><div class="dot"></div><div class="dot"></div>&nbsp;DECRYPTING CYBERPUNK MATRIX CORE…</div>';
+  
+  let scanCount = 0;
+  const scanInterval = setInterval(() => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+    let text = "";
+    for (let i = 0; i < 40; i++) text += chars[Math.floor(Math.random() * chars.length)];
+    o.innerHTML = `<span style="color:var(--green);font-family:monospace;letter-spacing:1px;font-size:10px">${text} [ANALYZING CODES]</span>`;
+    scanCount++;
+    if (scanCount > 12) {
+      clearInterval(scanInterval);
+      proceedWithAdvice(c, cap, gAP, gP, rem, gifts, glist);
+    }
+  }, 70);
+}
+
+async function proceedWithAdvice(c, cap, gAP, gP, rem, gifts, glist) {
+  const o=document.getElementById('ai-o');
+  const apiKey = localStorage.getItem('nte_v4_apikey');
+  
+  if (apiKey) {
+    const prompt=`Eres un experto analista del videojuego Neverness to Everness (NTE). El jugador tiene a ${c.name} (${c.el}·${c.rar}·${c.role}) en nivel ${lv(cap).level}/10 con ${cap.toLocaleString()} AP. Faltan ${rem.toLocaleString()} AP para el MAX. Usando regalos de ${gAP}AP a ${gP===0?'costo cero':gP.toLocaleString()+'₣'}: necesita ${gifts} regalos en ~${Math.ceil(gifts/3)} días. Regalos favoritos del personaje: ${glist}. También dispone de: Algodón Esponjoso(400AP,Gratis,~20-25/mes) y Ebisu Tower(100AP,Gratis). El jugador tiene ${CHARS.filter(ch=>S.ap[ch.id]>0).length} PJ activos en total. Danos 4-5 líneas concretas de consejo estratégico en español rioplatense (de Argentina, directo y muy informal, e.g. "Che, mirá..."). Habla sobre si gastar Fons o no en este personaje, cuál es el regalo más óptimo y una estimación de tiempo realista. No uses formato markdown.`;
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 250, temperature: 0.7 }
+        })
+      });
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+      const txt = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if (!txt) throw new Error();
+      o.textContent = txt.trim();
+    } catch(e) {
+      o.innerHTML = `<span style="color:var(--red);font-weight:700">⚠️ Error de conexión con Gemini. Usando Asesor de respaldo:</span><br>${generateOfflineAdvice(c, cap, gAP, gP)}`;
+    }
+  } else {
+    o.textContent = generateOfflineAdvice(c, cap, gAP, gP);
+  }
 }
 
 // PLAN
@@ -1792,6 +2182,7 @@ function buildShops(){
 
 // TABS
 function sw(t,btn){
+  SFX.play('tap');
   document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
   document.getElementById('tab-'+t).classList.add('on');
@@ -1799,8 +2190,118 @@ function sw(t,btn){
   if(t==='calc'){buildCalc();updSum();}
   if(t==='plan')buildPlan();
   if(t==='stats')updStats();
+  if(t==='tools'){
+    const key = localStorage.getItem('nte_v4_apikey');
+    const inp = document.getElementById('ai-key-inp');
+    const status = document.getElementById('ai-key-status');
+    if (inp) inp.value = key || '';
+    if (status) {
+      status.textContent = key ? '✓ API Key de Gemini guardada de forma segura.' : '📍 Usando Asesor Inteligente Offline (instantáneo).';
+      status.style.color = key ? 'var(--green)' : 'var(--t3)';
+    }
+  }
 }
 function swId(t){const btn=document.querySelector(`.tab[onclick*="'${t}'"]`);sw(t,btn);}
+
+// WEB AUDIO SFX ENGINE
+const SFX = {
+  ctx: null,
+  muted: localStorage.getItem('nte_muted') === 'true',
+  init() {
+    if (this.ctx) return;
+    try {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) {}
+  },
+  play(type) {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+    const now = this.ctx.currentTime;
+    if (type === 'tap') {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } else if (type === 'give') {
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(500, now);
+      osc1.frequency.exponentialRampToValueAtTime(1500, now + 0.25);
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(600, now);
+      osc2.frequency.exponentialRampToValueAtTime(1800, now + 0.25);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + 0.3);
+      osc2.stop(now + 0.3);
+    } else if (type === 'levelup') {
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const time = now + idx * 0.06;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, time);
+        gain.gain.setValueAtTime(0.07, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(time);
+        osc.stop(time + 0.35);
+      });
+    } else if (type === 'sweep') {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.linearRampToValueAtTime(80, now + 0.4);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.45);
+    }
+  }
+};
+
+function toggleMute() {
+  SFX.muted = !SFX.muted;
+  localStorage.setItem('nte_muted', SFX.muted);
+  const btn = document.getElementById('vol-btn');
+  if (btn) {
+    btn.innerHTML = SFX.muted ? `<i class="ti ti-volume-off" style="font-size:12px"></i>` : `<i class="ti ti-volume" style="font-size:12px"></i>`;
+  }
+  if (!SFX.muted) {
+    SFX.play('tap');
+  }
+}
+
+// Initial volume state sync on startup
+setTimeout(() => {
+  const btn = document.getElementById('vol-btn');
+  if (btn) {
+    btn.innerHTML = SFX.muted ? `<i class="ti ti-volume-off" style="font-size:12px"></i>` : `<i class="ti ti-volume" style="font-size:12px"></i>`;
+  }
+}, 50);
 
 // TOAST
 function toast(msg){
@@ -2011,6 +2512,7 @@ function updFishTracker() {
 // Build bait list on load
 buildBaitList();
 updFishTracker();
+updStaminaSim();
 
 </script>
 </body>
