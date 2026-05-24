@@ -1067,10 +1067,10 @@ body::before {
         </div>
       </div>
       <div>
-        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">XP Actual</label>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">XP en nivel actual</label>
         <div style="display:flex;align-items:center;gap:4px">
           <input type="number" id="fish-xp" min="0" value="0" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:14px;font-weight:700;padding:6px 8px;font-family:var(--fd)" oninput="updFishTracker()">
-          <span style="font-size:10px;color:var(--t3)">/400</span>
+          <span style="font-size:10px;color:var(--t3)" id="fish-xp-max">/675</span>
         </div>
       </div>
       <div>
@@ -2619,15 +2619,22 @@ function buildBaitList() {
 }
 
 function updFishTracker() {
+  const FISH_THRESH = [0, 0, 675, 1375, 2750, 6250, 10450, 15650, 27500, 42250, 56000];
   const lv = parseInt(document.getElementById('fish-lv').value)||1;
   const xp = parseInt(document.getElementById('fish-xp').value)||0;
+  
+  const maxXP = lv < 10 ? FISH_THRESH[lv+1] - FISH_THRESH[lv] : 0;
+  const maxEl = document.getElementById('fish-xp-max');
+  if(maxEl) maxEl.textContent = '/' + maxXP;
+
   const rod = parseInt(document.getElementById('fish-rod').value)||1;
   const dailyStam = parseInt(document.getElementById('fish-stamina').value)||2;
   const method = document.getElementById('fish-method').value;
   const sellMethod = document.getElementById('fish-sell-method').value;
   
   const lvRemain = Math.max(0,10-lv);
-  const totalXPRem = Math.max(0, (lvRemain * 400) - xp);
+  const totalCurrentXP = Math.min(56000, (FISH_THRESH[lv] || 56000) + xp);
+  const totalXPRem = Math.max(0, 56000 - totalCurrentXP);
   const annuliths = lvRemain*50;
   const cores = lvRemain*3;
   
