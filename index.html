@@ -37,9 +37,36 @@
   --sh:0 16px 48px rgba(0,0,0,0.65);
   --sh2:0 8px 24px rgba(0,0,0,0.5);
   --sh-neon:0 0 20px rgba(124,111,247,0.25);
+  --sh-glitch:2px 0 10px rgba(255, 72, 153, 0.4), -2px 0 10px rgba(6, 182, 212, 0.4);
 }
 html{scroll-behavior:smooth}
 body{font-family:var(--fb);background:var(--bg);background-image:var(--bg-radial);color:var(--t);min-height:100vh;overflow-x:hidden;line-height:1.55}
+
+/* NOTCHED UTILITIES */
+.notch-br { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%); }
+.notch-tl { clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px); }
+.notch-sm { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%); }
+
+/* GREEBLES & DECORATIVE HUD */
+.greeble { position: absolute; font-family: monospace; font-size: 7px; color: var(--t3); letter-spacing: 1px; pointer-events: none; opacity: 0.5; text-transform: uppercase; z-index: 5; }
+.greeble.top-r { top: 6px; right: 24px; }
+.greeble.bot-l { bottom: 6px; left: 12px; }
+.v-line { position: absolute; width: 1px; background: linear-gradient(to bottom, transparent, var(--b2), transparent); pointer-events: none; }
+
+/* GLITCH & NEON EFFECTS */
+.neon-txt { text-shadow: 0 0 10px var(--acg), 0 0 20px var(--acs); }
+.neon-brd { box-shadow: 0 0 15px var(--acs), inset 0 0 10px var(--acs); }
+
+@keyframes glitch-skew {
+  0% { transform: skew(0deg); }
+  20% { transform: skew(3deg); }
+  40% { transform: skew(-3deg); }
+  60% { transform: skew(1deg); }
+  80% { transform: skew(-1deg); }
+  100% { transform: skew(0deg); }
+}
+
+.glitch-hover:hover { animation: glitch-skew 0.3s cubic-bezier(.25,.46,.45,.94) both infinite; }
 
 /* DYNAMIC CYBERPUNK HUD OVERLAY & SCANLINES */
 body::before {
@@ -519,18 +546,26 @@ body::before {
 <!-- HEADER -->
 <header class="hdr">
   <div class="logo">
-    <div class="logo-mark"><i class="ti ti-sparkles"></i></div>
-    <span class="logo-text">Bond Tracker</span>
-    <span class="logo-sub">· NTE</span>
+    <div class="logo-mark notch-sm glitch-hover"><i class="ti ti-sparkles"></i></div>
+    <div>
+      <div style="display:flex;align-items:center">
+        <span class="logo-text neon-txt">Bond Tracker</span>
+        <span class="logo-sub">v1.2</span>
+      </div>
+      <div style="font-family:monospace;font-size:7px;color:var(--ac);letter-spacing:1px;margin-top:-2px;opacity:0.8">SYSTEM_STATUS: <span style="color:var(--green);animation:blink 1s infinite">CONNECTED</span></div>
+    </div>
   </div>
   <div class="hdr-right">
-    <div class="hpill gold"><i class="ti ti-gift" style="font-size:11px"></i>Hoy: <b id="hd">10</b>/10</div>
+    <div class="hpill gold neon-brd"><i class="ti ti-gift" style="font-size:11px;animation:logoPulse 2s infinite"></i>Hoy: <b id="hd">10</b>/10</div>
     <div class="hpill ac"><i class="ti ti-users" style="font-size:11px"></i><b id="hp">0</b> activos</div>
     <div class="hpill gr"><i class="ti ti-crown" style="font-size:11px"></i><b id="hm">0</b> MAX</div>
-    <button class="hdr-btn" onclick="exportData()" title="Exportar progreso"><i class="ti ti-download" style="font-size:12px"></i>Backup</button>
-    <button class="hdr-btn" onclick="document.getElementById('imp-file').click()" title="Importar progreso"><i class="ti ti-upload" style="font-size:12px"></i></button>
-    <button class="hdr-btn" id="vol-btn" onclick="toggleMute()" title="Activar/Silenciar sonido"><i class="ti ti-volume" style="font-size:12px"></i></button>
+    <button class="hdr-btn notch-sm" onclick="exportData()" title="Exportar progreso"><i class="ti ti-download" style="font-size:12px"></i>Backup</button>
+    <button class="hdr-btn notch-sm" onclick="document.getElementById('imp-file').click()" title="Importar progreso"><i class="ti ti-upload" style="font-size:12px"></i></button>
+    <button class="hdr-btn notch-sm" id="vol-btn" onclick="toggleMute()" title="Activar/Silenciar sonido"><i class="ti ti-volume" style="font-size:12px"></i></button>
     <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+  <div class="greeble top-r">NTE_LINK_CORE // NODE_8821</div>
+</header>
   </div>
 </header>
 
@@ -1744,17 +1779,32 @@ function charOk(c){
 function buildGrid(){
   const vis=CHARS.filter(charOk);
   document.getElementById('rc').textContent=vis.length+' PJ';
+  
+  const elIcos = {
+    Cosmos: 'ti-sparkles',
+    Anima: 'ti-leaf',
+    Incantation: 'ti-wand',
+    Chaos: 'ti-whirl',
+    Psyche: 'ti-eye',
+    Lakshana: 'ti-lotus'
+  };
+
   document.getElementById('cgrid').innerHTML=vis.map(c=>{
     const li=lv(S.ap[c.id]),maxed=li.level>=10,gifted=S.day[c.id]>0;
-    return`<div class="cc${S.sel===c.id?' sel':''}${maxed?' maxed':''}" onclick="selChar('${c.id}')" style="--hc:${c.col}">
+    const elIco = elIcos[c.el] || 'ti-circle';
+    
+    return`<div class="cc notch-br glitch-hover${S.sel===c.id?' sel':''}${maxed?' maxed':''}" onclick="selChar('${c.id}')" style="--hc:${c.col}">
+      <div class="greeble" style="top:4px; left:4px; opacity:0.3; font-size:5px">LN_${c.id.slice(0,3).toUpperCase()}</div>
       <div class="cc-av">
-        ${avImg(c,48)}
-        <div class="crar r${c.rar.toLowerCase()}">${c.rar}</div>
-        ${gifted&&!maxed?`<div style="position:absolute;top:-2px;left:-2px;width:10px;height:10px;border-radius:50%;background:var(--green);border:1.5px solid var(--bg2)"></div>`:''}
+        ${avImg(c,48, 'class="glitch-avatar"')}
+        <div class="crar notch-sm rs" style="background:${c.rar==='S'?'var(--gold)':'var(--ac)'}">${c.rar}</div>
+        ${gifted&&!maxed?`<div class="neon-brd" style="position:absolute;top:-2px;left:-2px;width:10px;height:10px;border-radius:50%;background:var(--green);border:1.5px solid var(--bg2)"></div>`:''}
       </div>
-      <div class="cname">${c.name}</div>
-      <div class="cel ${elc(c.el)}">${c.el}</div>
-      <div class="cbar"><div class="cbarf" style="width:${maxed?100:li.pct}%;background:${c.col}"></div></div>
+      <div class="cname neon-txt">${c.name}</div>
+      <div class="cel ${elc(c.el)}" style="display:flex; align-items:center; justify-content:center; gap:3px">
+        <i class="ti ${elIco}" style="font-size:9px"></i> ${c.el}
+      </div>
+      <div class="cbar" style="margin-top:8px"><div class="cbarf neon-brd" style="width:${maxed?100:li.pct}%;background:${c.col}"></div></div>
     </div>`;
   }).join('')||'<div style="color:var(--t3);font-size:12px;padding:20px;text-align:center;grid-column:1/-1">Ningún personaje encontrado</div>';
   updHdr();
