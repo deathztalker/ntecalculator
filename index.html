@@ -1051,10 +1051,14 @@ body::before {
   </div>
 
   <!-- FISHING TRACKER -->
-  <div class="box" style="margin-bottom:0">
-    <div class="box-t"><i class="ti ti-chart-line"></i>Mi progreso de pesca personal
-      <span style="margin-left:auto;font-size:10px;color:var(--t3);font-weight:500">Guardado localmente</span>
+  <div class="box" style="margin-bottom:0;position:relative">
+    <div class="greeble g-tr"></div>
+    <div class="greeble g-bl"></div>
+    <div class="box-t"><i class="ti ti-chart-line glitch-hover"></i>Calculadora de Pesca & Economía
+      <span style="margin-left:auto;font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:1px">Guardado localmente</span>
     </div>
+    
+    <!-- GRID DE INPUTS -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px">
       <div>
         <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Nivel actual</label>
@@ -1079,25 +1083,36 @@ body::before {
         </select>
       </div>
       <div>
-        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Suerte / Chance</label>
-        <select id="fish-luck" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:11px;padding:8px 8px;font-family:var(--fb)" onchange="updFishTracker()">
-          <option value="0.8">Mala (Pocos raros)</option>
-          <option value="1.0" selected>Normal (Promedio)</option>
-          <option value="1.3">Buena (Muchos épicos)</option>
-          <option value="1.7">Master (Puros legendarios)</option>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">City Stamina a usar</label>
+        <div style="display:flex;align-items:center;gap:4px">
+          <input type="number" id="fish-stamina" min="0" value="2" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:14px;font-weight:700;padding:6px 8px;font-family:var(--fd)" oninput="updFishTracker()">
+          <span style="font-size:10px;color:var(--t3)">/Día</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Estrategia de Pesca (EXP)</label>
+        <select id="fish-method" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:12px;padding:10px 12px;font-family:var(--fb)" onchange="updFishTracker()">
+          <option value="casual">Básico: Universal Bait, peces comunes (EXP baja)</option>
+          <option value="market">Intermedio: Daily Rec. Spots + Market (EXP media)</option>
+          <option value="epic">Avanzado: Sniper de épicos/legendarios (EXP alta)</option>
+          <option value="optimal">Óptimo: Sniper Épico + Market diario (EXP máxima)</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Estrategia de Venta (Fons & Coins)</label>
+        <select id="fish-sell-method" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:12px;padding:10px 12px;font-family:var(--fb)" onchange="updFishTracker()">
+          <option value="hold">Vender todo en Fish Hold (Más peces necesarios)</option>
+          <option value="market_hold">Vender 2 en Market, resto en Hold (Eficiente)</option>
+          <option value="market_only">Solo vender en Market (Ahorro máximo de Stamina)</option>
         </select>
       </div>
     </div>
-    <div style="margin-bottom:14px">
-      <label style="font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:5px">Método principal de farmeo</label>
-      <select id="fish-method" style="width:100%;background:var(--bg5);border:1px solid var(--b2);border-radius:var(--r1);color:var(--t);font-size:12px;padding:10px 12px;font-family:var(--fb)" onchange="updFishTracker()">
-        <option value="casual">Básico: Pesca casual con Universal Bait (EXP baja)</option>
-        <option value="market">Intermedio: Loop de Fish Market diario (EXP media)</option>
-        <option value="epic">Avanzado: Sniper de peces épicos/legendarios (EXP alta)</option>
-        <option value="optimal">Óptimo: Combinación de Market + Sniper Épico (EXP máxima)</option>
-      </select>
-    </div>
-    <div id="fish-tracker-out" style="background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:14px;font-size:11px;color:var(--t2);line-height:1.8"></div>
+
+    <!-- OUTPUT RESULTADOS -->
+    <div id="fish-tracker-out" style="background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:14px;font-size:11px;color:var(--t2);line-height:1.8" class="notch-sm"></div>
   </div>
 
 </div>
@@ -2607,28 +2622,54 @@ function updFishTracker() {
   const lv = parseInt(document.getElementById('fish-lv').value)||1;
   const xp = parseInt(document.getElementById('fish-xp').value)||0;
   const rod = parseInt(document.getElementById('fish-rod').value)||1;
-  const luck = parseFloat(document.getElementById('fish-luck').value)||1.0;
+  const dailyStam = parseInt(document.getElementById('fish-stamina').value)||2;
   const method = document.getElementById('fish-method').value;
+  const sellMethod = document.getElementById('fish-sell-method').value;
   
   const lvRemain = Math.max(0,10-lv);
   const totalXPRem = Math.max(0, (lvRemain * 400) - xp);
   const annuliths = lvRemain*50;
   const cores = lvRemain*3;
   
-  // Advanced Metrics
+  // Base EXP per fish catch based on strategy (rarity focus)
   const methodStats = {
-    casual:  {expBase: 15, fishesPerDay: 8},
-    market:  {expBase: 45, fishesPerDay: 12},
-    epic:    {expBase: 80, fishesPerDay: 15},
-    optimal: {expBase: 120, fishesPerDay: 20}
+    casual:  {expBase: 15, name: "Comunes"},
+    market:  {expBase: 35, name: "Peces del día"},
+    epic:    {expBase: 80, name: "Épicos/Legendarios"},
+    optimal: {expBase: 100, name: "Sniper + Market"}
   };
   
   const ms = methodStats[method]||methodStats.casual;
-  const realExpPerFish = Math.round(ms.expBase * luck);
-  const fishesTotal = Math.ceil(totalXPRem / realExpPerFish);
-  const days = Math.ceil(fishesTotal / ms.fishesPerDay);
-  const dailyFishes = ms.fishesPerDay;
-  const staminaCost = dailyFishes * 2; // ~2 stamina per loop (fishing + market/hold)
+  const realExpPerFish = ms.expBase;
+  
+  // Calculate daily catches based on Stamina and Sell Strategy
+  // 1 Fish Sold = 1 City Stamina = 1,000 Fons + City Tycoon EXP
+  let dailyFishes = 0;
+  let fonsGen = 0;
+  let marketFishes = 0;
+  let holdFishes = 0;
+  
+  if (sellMethod === 'market_only') {
+    dailyFishes = Math.min(2, dailyStam); // Only sell the 2 daily requested fishes
+    marketFishes = dailyFishes;
+    fonsGen = dailyFishes * 1000;
+  } else if (sellMethod === 'market_hold') {
+    dailyFishes = dailyStam; // Sell until stamina is depleted
+    marketFishes = Math.min(2, dailyStam);
+    holdFishes = dailyStam - marketFishes;
+    fonsGen = dailyStam * 1000;
+  } else {
+    // hold only
+    dailyFishes = dailyStam;
+    holdFishes = dailyStam;
+    fonsGen = dailyStam * 1000;
+  }
+  
+  // People might fish MORE than their stamina allows just for EXP (giving 0 Fons, but still EXP & Coins)
+  // Let's assume they fish exactly what they sell for this calculator, unless Stamina is 0.
+  const actualDailyFishes = Math.max(dailyFishes, 1); // at least 1 fish to avoid Infinity
+  const dailyFishingExp = actualDailyFishes * realExpPerFish;
+  const days = Math.ceil(totalXPRem / dailyFishingExp);
 
   const rodTip = rod===1?'⚠️ <strong style="color:var(--gold)">Comprá la Rod II lo antes posible</strong> — es el upgrade más importante.':
                  rod===2?'✅ Buena elección. Cuando tengas Scale Coins apuntá a la Rod III para legendarios.':
@@ -2636,8 +2677,10 @@ function updFishTracker() {
                  '🏆 Equipo de pesca máximo. Solo queda pescar!';
   
   const skinStatus = lv>=10?'<span style="color:var(--green);font-weight:700">✅ Ya obtuviste el Sea Angler Outfit</span>':
-    `Faltan <strong style="color:var(--ac)">${totalXPRem.toLocaleString()} EXP</strong> para el skin. Con tu método y suerte actual: ~<strong style="color:var(--teal)">${days} días</strong>.`;
+    `Faltan <strong style="color:var(--ac)">${totalXPRem.toLocaleString()} EXP</strong> para el skin. Con tu ritmo actual: ~<strong style="color:var(--teal)">${days} días</strong>.`;
   
+  const marketCoinBoost = marketFishes > 0 ? `<span style="color:var(--ac)">+300% Scale Coins en ${marketFishes} peces</span>` : `Sin bonus de mercado`;
+
   document.getElementById('fish-tracker-out').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
       <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
@@ -2645,16 +2688,16 @@ function updFishTracker() {
         <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Días aprox.</div>
       </div>
       <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center;box-shadow:inset 0 0 12px rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2)">
-        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--green)">${dailyFishes}</div>
-        <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Peces/Día</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--green)">${dailyFishingExp}</div>
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase">EXP / Día</div>
       </div>
       <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
-        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--gold)">${annuliths}</div>
-        <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Annuliths rest.</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--gold)">${fmt(fonsGen)}</div>
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Fons / Día</div>
       </div>
       <div style="background:var(--bg4);border-radius:var(--r1);padding:9px;text-align:center">
-        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--ac)">${cores}</div>
-        <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Cores rest.</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--ac)">${actualDailyFishes}</div>
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase">Peces a pescar</div>
       </div>
     </div>
     
@@ -2662,18 +2705,18 @@ function updFishTracker() {
        <div style="font-size:18px">🎣</div>
        <div style="flex:1">
          <div style="font-size:11px;font-weight:700;color:var(--t);display:flex;justify-content:space-between">
-           <span>Meta Diaria: Pescar ${dailyFishes} peces hoy</span>
-           <span style="color:var(--teal)">+${realExpPerFish} EXP/pez</span>
+           <span>Economía Diaria Proyectada</span>
+           <span style="color:var(--teal)">${marketCoinBoost}</span>
          </div>
-         <div style="font-size:10px;color:var(--t2)">Consumirá aprox. <strong style="color:var(--ac)">${staminaCost} City Stamina</strong>. Necesitás <strong style="color:var(--t)">${fishesTotal}</strong> capturas totales.</div>
+         <div style="font-size:10px;color:var(--t2);line-height:1.5">Al vender <strong style="color:var(--ac)">${actualDailyFishes} peces</strong> consumís <strong style="color:var(--red)">${actualDailyFishes} City Stamina</strong>. Obtenés <strong style="color:var(--gold)">${fonsGen.toLocaleString()} Fons</strong> y aprox. <strong style="color:var(--pink)">${actualDailyFishes * 10} City Tycoon EXP</strong>. ${actualDailyFishes > dailyStam ? '<br><em style="color:var(--gold)">⚠ Estás pescando más peces de la stamina disponible. Los excedentes darán Scale Coins pero NO Fons.</em>' : ''}</div>
        </div>
     </div>
 
     <div style="margin-bottom:8px">${rodTip}</div>
     <div>${skinStatus}</div>
-    ${lv<4?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 1 — enfocate en juntar Scale Coins para la Rod II antes que nada.</div>':
-      lv<7?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 2 — el loop del Fish Market diario es tu mejor amigo ahora.</div>':
-      lv<10?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 3 — cazá épicos y legendarios, cada captura vale mucho más EXP.</div>':
+    ${lv<4?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 1 — enfocate en juntar Scale Coins para la Rod II vendiendo en Fish Hold.</div>':
+      lv<7?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 2 — el loop del Fish Market diario (2 peces premium) es vital para tu economía.</div>':
+      lv<10?'<div style="margin-top:6px;color:var(--t3)">📍 Estás en Fase 3 — cazá épicos y legendarios, cada captura vale muchísimo más EXP.</div>':
       '<div style="margin-top:6px;color:var(--green)">🎣 ¡Master Angler! Disfrutá el skin.</div>'}
   `;
 }
